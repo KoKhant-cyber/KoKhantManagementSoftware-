@@ -43,8 +43,15 @@
             <img src="logo.png" alt="Ko Khant Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-indigo-600 flex items-center justify-center font-bold text-lg text-white\'>KK</div>';">
           </div>
           <div>
-            <h1 class="font-bold text-lg tracking-tight leading-tight">Ko Khant (Lin Htet Phyo)</h1>
-            <p class="text-xs text-indigo-400 font-medium tracking-wide">Laptop & Service Hub</p>
+            <h1 class="font-bold text-base tracking-tight leading-tight">Ko Khant</h1>
+            <p class="text-xs text-indigo-400 font-medium tracking-wide">(Lin Htet Phyo)</p>
+          </div>
+        </div>
+
+        <!-- Role Status Bar in Sidebar -->
+        <div class="px-4 pt-4 pb-2">
+          <div id="sidebar-role-card" class="p-2.5 rounded-xl border flex items-center justify-between text-xs transition">
+            <!-- Injected via JS (Admin / Staff status) -->
           </div>
         </div>
 
@@ -67,23 +74,22 @@
           </button>
           <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
             <i data-lucide="settings" class="w-5 h-5"></i>
-            <span>Settings & Backup</span>
+            <span>Settings & Security</span>
           </button>
-                  <button onclick="lockApp()" title="Lock Screen" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-amber-400/90 hover:bg-slate-800 hover:text-amber-300">
+          <button onclick="lockToStaffMode()" id="nav-lock-role" title="Lock Admin Rights" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-amber-400 hover:bg-slate-800 hover:text-amber-300">
             <i data-lucide="lock" class="w-5 h-5"></i>
-            <span>Lock Screen</span>
+            <span>Lock to Staff Mode</span>
           </button>
         </nav>
-
       </div>
 
       <div class="p-4 border-t border-slate-800">
         <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
           <div class="flex items-center space-x-2 text-xs text-slate-400 mb-1">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Ko Khant (Lin Htet Phyo) v1.2</span>
+            <span>Ko Khant Software v2.0</span>
           </div>
-          <p class="text-xs text-slate-400">Offline & LocalStorage Active</p>
+          <p class="text-xs text-slate-400">Offline & Role Protected</p>
         </div>
       </div>
     </aside>
@@ -97,7 +103,12 @@
           <p id="page-subtitle" class="text-xs sm:text-sm text-slate-500">Monitor your inventory, repairs, and daily financial metrics</p>
         </div>
         <div class="flex items-center gap-3">
-          <button onclick="openNewLaptopModal()" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+          <!-- Active Role Switcher Button in Header -->
+          <div id="header-role-badge" class="flex items-center">
+            <!-- Injected via JS -->
+          </div>
+
+          <button onclick="openNewLaptopModal()" id="btn-header-add-laptop" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
             <i data-lucide="plus" class="w-4 h-4"></i>
             <span>Add Laptop</span>
           </button>
@@ -208,7 +219,7 @@
               </select>
               <button onclick="openNewLaptopModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition flex items-center space-x-1.5">
                 <i data-lucide="plus" class="w-4 h-4"></i>
-                <span>Add Laptop</span>
+                <span id="label-inventory-add">Add Laptop</span>
               </button>
             </div>
           </div>
@@ -305,8 +316,71 @@
           </div>
         </section>
 
-        <!-- SETTINGS & BACKUP TAB -->
+        <!-- SETTINGS & SECURITY TAB -->
         <section id="tab-settings" class="tab-content hidden space-y-6 max-w-4xl">
+          <!-- Role Permission Notice -->
+          <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
+                <i data-lucide="shield-check" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm text-indigo-950">Admin Permission Active</h4>
+                <p class="text-xs text-indigo-700">You have full permission to add/edit stock, change purchase costs, and configure security passwords.</p>
+              </div>
+            </div>
+            <button onclick="lockToStaffMode()" class="px-3.5 py-1.5 bg-white text-indigo-700 border border-indigo-300 hover:bg-indigo-100/50 rounded-lg text-xs font-semibold transition">
+              Lock to Staff Mode
+            </button>
+          </div>
+
+          <!-- Role Access & Password Control -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-base text-slate-800 flex items-center space-x-2">
+              <i data-lucide="key" class="w-5 h-5 text-indigo-600"></i>
+              <span>Role Permissions & Passwords</span>
+            </h3>
+            <p class="text-xs text-slate-500">Configure who can add stock, view purchase costs, and modify inventory listings.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Admin Password (Full Access)</label>
+                <input type="password" id="setting-admin-pwd" placeholder="Enter Admin Password (e.g. 8888)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="text-[11px] text-slate-400 mt-1">Needed to add laptops, change cost/price, and delete stock.</p>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Staff PIN (General Access)</label>
+                <input type="password" id="setting-staff-pin" placeholder="Enter Staff PIN (e.g. 1234)" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="text-[11px] text-slate-400 mt-1">Can create repair tickets and sell laptops without seeing profit margins.</p>
+              </div>
+            </div>
+
+            <!-- Permission Rules Checkboxes -->
+            <div class="space-y-3 pt-3 border-t border-slate-100">
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="setting-require-admin-stock" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+                <span class="text-xs text-slate-700 font-medium">Require Admin Password to Add, Edit, or Delete Laptop Stock</span>
+              </label>
+
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="setting-hide-costs" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+                <span class="text-xs text-slate-700 font-medium">Hide Purchase Cost & Profit Margins from Staff Mode (Masked with Confidential)</span>
+              </label>
+
+              <label class="flex items-center space-x-3 cursor-pointer">
+                <input type="checkbox" id="setting-lock-on-open" class="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+                <span class="text-xs text-slate-700 font-medium">Lock Software completely on startup (Requires PIN/Password to open)</span>
+              </label>
+            </div>
+
+            <div class="pt-2">
+              <button onclick="savePermissionSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+                Save Security & Permission Rules
+              </button>
+            </div>
+          </div>
+
           <!-- Shop Info Settings -->
           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
             <h3 class="font-bold text-base text-slate-800">Business Profile & Receipts</h3>
@@ -332,53 +406,6 @@
             <div class="pt-2">
               <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
                 Save Business Profile
-              </button>
-            </div>
-          </div>
-
-                    <!-- Access Permission & Security Lock Settings -->
-          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-bold text-base text-slate-800 flex items-center space-x-2">
-                  <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
-                  <span>Access Permission Lock (PIN Protection)</span>
-                </h3>
-                <p class="text-xs text-slate-500">Protect your shop records, laptop pricing, and customer details with a security PIN.</p>
-              </div>
-              <span id="lock-status-badge" class="px-2.5 py-1 text-xs rounded-full font-semibold bg-slate-100 text-slate-600">
-                Disabled
-              </span>
-            </div>
-
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
-              <div class="flex items-center justify-between">
-                <div>
-                  <label for="setting-lock-enabled" class="text-sm font-semibold text-slate-800 cursor-pointer">Enable Security Lock on Startup</label>
-                  <p class="text-xs text-slate-500">Require the PIN every time the app opens or when locked manually.</p>
-                </div>
-                <input type="checkbox" id="setting-lock-enabled" onchange="toggleLockCheckbox(this.checked)" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
-              </div>
-
-              <div id="pin-config-section" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
-                <div>
-                  <label class="block text-xs font-semibold text-slate-600 mb-1">Set Access PIN / Password</label>
-                  <input type="password" id="setting-app-pin" placeholder="Enter 4-8 digit PIN (e.g. 1234)" maxlength="16" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-semibold text-slate-600 mb-1">Confirm PIN</label>
-                  <input type="password" id="setting-app-pin-confirm" placeholder="Re-enter PIN" maxlength="16" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-              </div>
-            </div>
-
-            <div class="pt-1 flex items-center space-x-3">
-              <button onclick="saveSecuritySettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
-                Update Security Settings
-              </button>
-              <button onclick="lockApp()" id="btn-test-lock" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition inline-flex items-center space-x-1.5">
-                <i data-lucide="lock" class="w-4 h-4 text-slate-500"></i>
-                <span>Lock Screen Now</span>
               </button>
             </div>
           </div>
@@ -409,6 +436,36 @@
         </section>
       </div>
     </main>
+  </div>
+
+  <!-- MODAL: ADMIN AUTHORIZATION PROMPT -->
+  <div id="modal-admin-auth" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-[9990] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 border border-slate-100">
+      <div class="mx-auto w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+      </div>
+
+      <div>
+        <h3 class="text-lg font-bold text-slate-800 tracking-tight">Admin Authorization Required</h3>
+        <p id="admin-auth-reason" class="text-xs text-slate-500 mt-1">Enter Admin Password to add or change laptop stock listings.</p>
+      </div>
+
+      <form id="form-admin-auth" onsubmit="handleAdminAuthSubmit(event)" class="space-y-3">
+        <div>
+          <input type="password" id="admin-auth-pwd" autocomplete="off" placeholder="Enter Admin Password" class="w-full text-center text-base tracking-widest font-mono py-2.5 px-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
+          <p id="admin-auth-error" class="text-xs text-rose-500 font-medium mt-1.5 hidden">Incorrect password. Please try again.</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button type="button" onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50 transition">
+            Cancel
+          </button>
+          <button type="submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-500/20 transition">
+            Verify & Unlock
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODAL: ADD / EDIT LAPTOP -->
@@ -636,8 +693,34 @@
     </div>
   </div>
 
+  <!-- FULLSCREEN SYSTEM LOCK (If Startup Lock is Enabled) -->
+  <div id="app-startup-lock-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-[9999] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border border-slate-100">
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-md shadow-indigo-500/10">
+        <i data-lucide="lock" class="w-8 h-8"></i>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-bold text-slate-800 tracking-tight">Ko Khant Software</h3>
+        <p class="text-xs text-slate-500 mt-1">Ko Khant (Lin Htet Phyo) Laptop Sales & Services</p>
+        <p class="text-xs text-slate-400 mt-0.5">Enter PIN or Password to access system</p>
+      </div>
+
+      <form id="form-startup-unlock" onsubmit="handleStartupUnlock(event)" class="space-y-4">
+        <div>
+          <input type="password" id="startup-pin-input" autofocus autocomplete="off" placeholder="&bull; &bull; &bull; &bull;" maxlength="20" class="w-full text-center text-2xl tracking-[0.4em] font-mono py-3 px-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
+          <p id="startup-error-msg" class="text-xs text-rose-500 font-medium mt-2 hidden">Incorrect passcode. Try again.</p>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition">
+          Unlock System
+        </button>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // LocalStorage Keys
+    // Storage Keys
     const KEY_LAPTOPS = 'kokhant_laptops_v1';
     const KEY_SERVICES = 'kokhant_services_v1';
     const KEY_SALES = 'kokhant_sales_v1';
@@ -647,20 +730,27 @@
     let laptops = [];
     let services = [];
     let sales = [];
+    let currentRole = sessionStorage.getItem('kokhant_role') || 'staff'; // 'admin' | 'staff'
+    let pendingAdminCallback = null;
+
     let settings = {
       shopName: "Ko Khant (Lin Htet Phyo) Laptop Sales & Services",
       phone: "+95 9 123 456 789",
       currency: "$",
       address: "Downtown Commercial Center, Tech Plaza Shop #12",
-      lockEnabled: false,
-      appPin: "1234"
+      adminPassword: "admin", // Default Admin password
+      staffPin: "1234",       // Default Staff PIN
+      requireAdminToAddStock: true, // Only admin can add/edit/delete laptop stock
+      hideCostFromStaff: true,      // Hide cost & margin in staff mode
+      lockOnOpen: false
     };
 
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
+      checkStartupLock();
+      updateRoleUI();
       renderAll();
-      checkAppLockOnStartup();
       lucide.createIcons();
     });
 
@@ -671,7 +761,7 @@
       const storedSettings = localStorage.getItem(KEY_SETTINGS);
 
       if (storedSettings) {
-        settings = JSON.parse(storedSettings);
+        settings = Object.assign(settings, JSON.parse(storedSettings));
       }
 
       if (storedLaptops) {
@@ -700,6 +790,12 @@
       document.getElementById('setting-shop-phone').value = settings.phone || '';
       document.getElementById('setting-shop-currency').value = settings.currency || '$';
       document.getElementById('setting-shop-address').value = settings.address || '';
+
+      document.getElementById('setting-admin-pwd').value = settings.adminPassword || 'admin';
+      document.getElementById('setting-staff-pin').value = settings.staffPin || '1234';
+      document.getElementById('setting-require-admin-stock').checked = settings.requireAdminToAddStock !== false;
+      document.getElementById('setting-hide-costs').checked = settings.hideCostFromStaff !== false;
+      document.getElementById('setting-lock-on-open').checked = settings.lockOnOpen === true;
     }
 
     function saveLaptops() {
@@ -719,6 +815,234 @@
       localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
       alert('Business Profile Settings Saved Successfully!');
       renderAll();
+    }
+
+    function savePermissionSettings() {
+      const adminPwd = document.getElementById('setting-admin-pwd').value.trim();
+      const staffPin = document.getElementById('setting-staff-pin').value.trim();
+
+      if (!adminPwd) {
+        alert('Admin password cannot be blank.');
+        return;
+      }
+
+      settings.adminPassword = adminPwd;
+      settings.staffPin = staffPin || '1234';
+      settings.requireAdminToAddStock = document.getElementById('setting-require-admin-stock').checked;
+      settings.hideCostFromStaff = document.getElementById('setting-hide-costs').checked;
+      settings.lockOnOpen = document.getElementById('setting-lock-on-open').checked;
+
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+      alert('Security & Role Permissions updated successfully!');
+      renderAll();
+      updateRoleUI();
+    }
+
+    // Role Management & Permissions
+    function updateRoleUI() {
+      const isAdmin = (currentRole === 'admin');
+      const headerRoleBadge = document.getElementById('header-role-badge');
+      const sidebarRoleCard = document.getElementById('sidebar-role-card');
+      const navLockBtn = document.getElementById('nav-lock-role');
+      const labelAdd = document.getElementById('label-inventory-add');
+
+      if (isAdmin) {
+        headerRoleBadge.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Admin Mode (Full Access)</span>
+            </span>
+            <button onclick="lockToStaffMode()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline px-1.5 py-1">
+              Lock to Staff
+            </button>
+          </div>
+        `;
+
+        sidebarRoleCard.className = 'p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/30 text-emerald-300 flex items-center justify-between text-xs';
+        sidebarRoleCard.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+            <div>
+              <p class="font-bold leading-tight">Admin Unlocked</p>
+              <p class="text-[10px] text-emerald-400/80">Can add & edit stock</p>
+            </div>
+          </div>
+          <button onclick="lockToStaffMode()" class="px-2 py-1 bg-emerald-900/60 hover:bg-emerald-800 text-[11px] rounded text-white font-medium">Lock</button>
+        `;
+
+        if (navLockBtn) navLockBtn.classList.remove('hidden');
+        if (labelAdd) labelAdd.innerText = 'Add Laptop';
+      } else {
+        headerRoleBadge.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 shadow-xs">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-amber-600"></i>
+              <span>Staff Mode</span>
+            </span>
+            <button onclick="promptAdminLogin('Enter Admin password to unlock full permissions')" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline px-1.5 py-1">
+              Unlock Admin
+            </button>
+          </div>
+        `;
+
+        sidebarRoleCard.className = 'p-2.5 rounded-xl border border-slate-700 bg-slate-800/80 text-slate-300 flex items-center justify-between text-xs';
+        sidebarRoleCard.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <i data-lucide="user" class="w-4 h-4 text-amber-400"></i>
+            <div>
+              <p class="font-bold leading-tight">Staff Mode</p>
+              <p class="text-[10px] text-slate-400">Pricing & stock locked</p>
+            </div>
+          </div>
+          <button onclick="promptAdminLogin()" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-[11px] rounded text-white font-medium">Unlock</button>
+        `;
+
+        if (navLockBtn) navLockBtn.classList.add('hidden');
+        if (labelAdd) labelAdd.innerText = 'Add Laptop 🔒';
+      }
+      lucide.createIcons();
+    }
+
+    function lockToStaffMode() {
+      currentRole = 'staff';
+      sessionStorage.setItem('kokhant_role', 'staff');
+      updateRoleUI();
+      renderAll();
+      // If currently on settings tab, bounce back to dashboard
+      const settingsTab = document.getElementById('tab-settings');
+      if (settingsTab && !settingsTab.classList.contains('hidden')) {
+        switchTabDirect('dashboard');
+      }
+    }
+
+    function requireAdminAuth(callback, reasonText) {
+      if (currentRole === 'admin') {
+        callback();
+        return;
+      }
+      pendingAdminCallback = callback;
+      const modal = document.getElementById('modal-admin-auth');
+      const reasonEl = document.getElementById('admin-auth-reason');
+      const errEl = document.getElementById('admin-auth-error');
+      const pwdInput = document.getElementById('admin-auth-pwd');
+
+      if (reasonText) reasonEl.innerText = reasonText;
+      else reasonEl.innerText = "Admin password required to add, edit, or configure laptop stock.";
+
+      errEl.classList.add('hidden');
+      pwdInput.value = '';
+      modal.classList.remove('hidden');
+      setTimeout(() => pwdInput.focus(), 100);
+    }
+
+    function promptAdminLogin(reason) {
+      requireAdminAuth(() => {
+        alert('Admin permission unlocked successfully!');
+      }, reason || 'Enter Admin password to unlock stock adding and cost margins.');
+    }
+
+    function handleAdminAuthSubmit(e) {
+      e.preventDefault();
+      const entered = document.getElementById('admin-auth-pwd').value;
+      const expected = settings.adminPassword || 'admin';
+      const errEl = document.getElementById('admin-auth-error');
+
+      if (entered === expected) {
+        currentRole = 'admin';
+        sessionStorage.setItem('kokhant_role', 'admin');
+        closeAdminAuthModal();
+        updateRoleUI();
+        renderAll();
+        if (pendingAdminCallback) {
+          const cb = pendingAdminCallback;
+          pendingAdminCallback = null;
+          cb();
+        }
+      } else {
+        errEl.classList.remove('hidden');
+        document.getElementById('admin-auth-pwd').value = '';
+        document.getElementById('admin-auth-pwd').focus();
+      }
+    }
+
+    function closeAdminAuthModal() {
+      document.getElementById('modal-admin-auth').classList.add('hidden');
+      pendingAdminCallback = null;
+    }
+
+    // Startup Lock Screen
+    function checkStartupLock() {
+      if (settings.lockOnOpen && sessionStorage.getItem('kokhant_unlocked') !== 'true') {
+        document.getElementById('app-startup-lock-screen').classList.remove('hidden');
+      }
+    }
+
+    function handleStartupUnlock(e) {
+      e.preventDefault();
+      const input = document.getElementById('startup-pin-input').value;
+      const adminPwd = settings.adminPassword || 'admin';
+      const staffPin = settings.staffPin || '1234';
+      const errorMsg = document.getElementById('startup-error-msg');
+
+      if (input === adminPwd) {
+        currentRole = 'admin';
+        sessionStorage.setItem('kokhant_role', 'admin');
+        sessionStorage.setItem('kokhant_unlocked', 'true');
+        document.getElementById('app-startup-lock-screen').classList.add('hidden');
+        updateRoleUI();
+        renderAll();
+      } else if (input === staffPin) {
+        currentRole = 'staff';
+        sessionStorage.setItem('kokhant_role', 'staff');
+        sessionStorage.setItem('kokhant_unlocked', 'true');
+        document.getElementById('app-startup-lock-screen').classList.add('hidden');
+        updateRoleUI();
+        renderAll();
+      } else {
+        errorMsg.classList.remove('hidden');
+        document.getElementById('startup-pin-input').value = '';
+        document.getElementById('startup-pin-input').focus();
+      }
+    }
+
+    // Tab Navigation
+    function switchTab(tabName) {
+      if (tabName === 'settings' && currentRole !== 'admin') {
+        requireAdminAuth(() => switchTabDirect('settings'), 'Admin authorization required to access System & Security Settings.');
+        return;
+      }
+      switchTabDirect(tabName);
+    }
+
+    function switchTabDirect(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+        btn.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+      });
+
+      const selectedTab = document.getElementById(`tab-${tabName}`);
+      const selectedNav = document.getElementById(`nav-${tabName}`);
+      if (selectedTab) selectedTab.classList.remove('hidden');
+      if (selectedNav) {
+        selectedNav.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+        selectedNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
+      }
+
+      const titles = {
+        dashboard: ['Overview Dashboard', 'Monitor your inventory, repairs, and daily financial metrics'],
+        inventory: ['Laptop Inventory', 'Manage in-stock laptops, specifications, cost, and sales listings'],
+        services: ['Repair & Service Tickets', 'Track workbench repair status, diagnostics, and customer receipts'],
+        sales: ['Sales & Billing Log', 'Record of completed laptop sales and paid repair invoices'],
+        settings: ['System & Security Settings', 'Configure shop metadata, admin passwords, and backups']
+      };
+
+      if (titles[tabName]) {
+        document.getElementById('page-title').innerText = titles[tabName][0];
+        document.getElementById('page-subtitle').innerText = titles[tabName][1];
+      }
+      lucide.createIcons();
     }
 
     // Default Seed Data
@@ -814,37 +1138,6 @@
       ];
     }
 
-    // Switch Tabs
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
-        btn.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
-      });
-
-      const selectedTab = document.getElementById(`tab-${tabName}`);
-      const selectedNav = document.getElementById(`nav-${tabName}`);
-      if (selectedTab) selectedTab.classList.remove('hidden');
-      if (selectedNav) {
-        selectedNav.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
-        selectedNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
-      }
-
-      const titles = {
-        dashboard: ['Overview Dashboard', 'Monitor your inventory, repairs, and daily financial metrics'],
-        inventory: ['Laptop Inventory', 'Manage in-stock laptops, specifications, cost, and sales listings'],
-        services: ['Repair & Service Tickets', 'Track workbench repair status, diagnostics, and customer receipts'],
-        sales: ['Sales & Billing Log', 'Record of completed laptop sales and paid repair invoices'],
-        settings: ['System Settings & Backups', 'Configure shop metadata and export/import offline JSON records']
-      };
-
-      if (titles[tabName]) {
-        document.getElementById('page-title').innerText = titles[tabName][0];
-        document.getElementById('page-subtitle').innerText = titles[tabName][1];
-      }
-      lucide.createIcons();
-    }
-
     // Render Master
     function renderAll() {
       renderDashboard();
@@ -870,7 +1163,13 @@
       const combinedRev = salesRev + serviceRev;
 
       document.getElementById('stat-instock').innerText = inStockCount;
-      document.getElementById('stat-inventory-val').innerText = `Valuation: ${curr}${inventoryVal.toLocaleString()}`;
+
+      // Mask Valuation from Staff if configured
+      if (currentRole === 'staff' && settings.hideCostFromStaff) {
+        document.getElementById('stat-inventory-val').innerText = `Valuation: •••••• (Admin Only)`;
+      } else {
+        document.getElementById('stat-inventory-val').innerText = `Valuation: ${curr}${inventoryVal.toLocaleString()}`;
+      }
 
       document.getElementById('stat-active-repairs').innerText = activeRepairs.length;
       document.getElementById('stat-pending-pickup').innerText = `${pendingPickup} ready for pickup`;
@@ -913,11 +1212,13 @@
       }
     }
 
-    // Render Laptops Table
+    // Render Laptops Table (with Role-Based Masking)
     function renderLaptops() {
       const curr = settings.currency || '$';
       const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
       const statusFilter = document.getElementById('inventory-filter-status')?.value || 'ALL';
+      const isAdmin = (currentRole === 'admin');
+      const hideCosts = !isAdmin && settings.hideCostFromStaff;
 
       const filtered = laptops.filter(item => {
         const matchesSearch = 
@@ -957,12 +1258,20 @@
             </td>
             <td class="px-4 py-3 text-xs">
               <div class="font-semibold text-slate-800">${curr}${price.toFixed(2)}</div>
-              <div class="text-slate-400">Cost: ${curr}${cost.toFixed(2)}</div>
+              <div class="text-slate-400">
+                ${hideCosts ? 'Cost: <span class="tracking-widest font-mono text-[11px] text-slate-400">••••</span>' : `Cost: ${curr}${cost.toFixed(2)}`}
+              </div>
             </td>
             <td class="px-4 py-3 text-xs">
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${margin >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
-                +${curr}${margin.toFixed(2)} (${marginPct}%)
-              </span>
+              ${hideCosts ? `
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-500">
+                  <i data-lucide="lock" class="w-3 h-3 mr-1 inline"></i> Restricted
+                </span>
+              ` : `
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${margin >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                  +${curr}${margin.toFixed(2)} (${marginPct}%)
+                </span>
+              `}
             </td>
             <td class="px-4 py-3">
               <span class="px-2.5 py-1 text-xs rounded-full font-medium ${getStatusBadge(l.status)}">${l.status}</span>
@@ -973,10 +1282,10 @@
                   Sell
                 </button>
               ` : ''}
-              <button onclick="editLaptop('${l.id}')" class="p-1 text-slate-400 hover:text-indigo-600">
-                <i data-lucide="edit-3" class="w-4 h-4 inline"></i>
+              <button onclick="editLaptop('${l.id}')" title="${isAdmin ? 'Edit Specs' : 'Edit Specs (Admin Only)'}" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="${isAdmin ? 'edit-3' : 'lock'}" class="w-4 h-4 inline"></i>
               </button>
-              <button onclick="deleteLaptop('${l.id}')" class="p-1 text-slate-400 hover:text-rose-600">
+              <button onclick="deleteLaptop('${l.id}')" title="${isAdmin ? 'Delete' : 'Delete (Admin Only)'}" class="p-1 text-slate-400 hover:text-rose-600">
                 <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
               </button>
             </td>
@@ -986,7 +1295,99 @@
       lucide.createIcons();
     }
 
-    // Render Repair Services Table
+    // Modal Handlers - Laptop (Protected)
+    function openNewLaptopModal() {
+      if (settings.requireAdminToAddStock && currentRole !== 'admin') {
+        requireAdminAuth(() => openNewLaptopModalDirect(), 'Admin password required to add a new laptop to inventory.');
+        return;
+      }
+      openNewLaptopModalDirect();
+    }
+
+    function openNewLaptopModalDirect() {
+      document.getElementById('form-laptop').reset();
+      document.getElementById('laptop-id').value = '';
+      document.getElementById('modal-laptop-title').innerText = 'Add Laptop to Inventory';
+      document.getElementById('modal-laptop').classList.remove('hidden');
+    }
+
+    function editLaptop(id) {
+      if (settings.requireAdminToAddStock && currentRole !== 'admin') {
+        requireAdminAuth(() => editLaptopDirect(id), 'Admin password required to edit laptop specifications or prices.');
+        return;
+      }
+      editLaptopDirect(id);
+    }
+
+    function editLaptopDirect(id) {
+      const item = laptops.find(l => l.id === id);
+      if (!item) return;
+
+      document.getElementById('laptop-id').value = item.id;
+      document.getElementById('lap-brand').value = item.brand;
+      document.getElementById('lap-model').value = item.model;
+      document.getElementById('lap-cpu').value = item.cpu || '';
+      document.getElementById('lap-ram').value = item.ram || '';
+      document.getElementById('lap-storage').value = item.storage || '';
+      document.getElementById('lap-serial').value = item.serial || '';
+      document.getElementById('lap-condition').value = item.condition || 'Like New (99%)';
+      document.getElementById('lap-cost').value = item.cost;
+      document.getElementById('lap-price').value = item.price;
+      document.getElementById('lap-status').value = item.status || 'In Stock';
+      document.getElementById('lap-notes').value = item.notes || '';
+
+      document.getElementById('modal-laptop-title').innerText = 'Edit Laptop Specs';
+      document.getElementById('modal-laptop').classList.remove('hidden');
+    }
+
+    function deleteLaptop(id) {
+      if (settings.requireAdminToAddStock && currentRole !== 'admin') {
+        requireAdminAuth(() => deleteLaptopDirect(id), 'Admin password required to delete inventory stock.');
+        return;
+      }
+      deleteLaptopDirect(id);
+    }
+
+    function deleteLaptopDirect(id) {
+      if (confirm('Are you sure you want to remove this laptop from inventory?')) {
+        laptops = laptops.filter(l => l.id !== id);
+        saveLaptops();
+        renderAll();
+      }
+    }
+
+    function handleSaveLaptop(e) {
+      e.preventDefault();
+      const id = document.getElementById('laptop-id').value;
+
+      const laptopData = {
+        id: id || ('lap_' + Date.now()),
+        brand: document.getElementById('lap-brand').value.trim(),
+        model: document.getElementById('lap-model').value.trim(),
+        cpu: document.getElementById('lap-cpu').value.trim(),
+        ram: document.getElementById('lap-ram').value.trim(),
+        storage: document.getElementById('lap-storage').value.trim(),
+        serial: document.getElementById('lap-serial').value.trim(),
+        condition: document.getElementById('lap-condition').value,
+        cost: parseFloat(document.getElementById('lap-cost').value) || 0,
+        price: parseFloat(document.getElementById('lap-price').value) || 0,
+        status: document.getElementById('lap-status').value,
+        notes: document.getElementById('lap-notes').value.trim()
+      };
+
+      if (id) {
+        const index = laptops.findIndex(l => l.id === id);
+        if (index !== -1) laptops[index] = laptopData;
+      } else {
+        laptops.unshift(laptopData);
+      }
+
+      saveLaptops();
+      closeModal('modal-laptop');
+      renderAll();
+    }
+
+    // Repair Services Management (Always Open for Staff & Admin)
     function renderServices() {
       const curr = settings.currency || '$';
       const search = (document.getElementById('service-search')?.value || '').toLowerCase();
@@ -1059,129 +1460,6 @@
       lucide.createIcons();
     }
 
-    // Render Sales Invoices Table
-    function renderSales() {
-      const curr = settings.currency || '$';
-      const search = (document.getElementById('sales-search')?.value || '').toLowerCase();
-
-      const filtered = sales.filter(item => {
-        return (
-          item.id.toLowerCase().includes(search) ||
-          item.customer.toLowerCase().includes(search) ||
-          item.item.toLowerCase().includes(search)
-        );
-      });
-
-      const tbody = document.getElementById('sales-table-body');
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">No sales invoices logged yet</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(sl => {
-        return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="px-4 py-3">
-              <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${sl.type === 'Laptop Sale' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}">
-                ${sl.type}
-              </span>
-            </td>
-            <td class="px-4 py-3 font-mono text-xs font-semibold text-slate-700">
-              ${sl.id}
-            </td>
-            <td class="px-4 py-3 text-xs">
-              <div class="font-medium text-slate-800">${sl.customer}</div>
-              <div class="text-slate-400">${sl.phone || '-'}</div>
-            </td>
-            <td class="px-4 py-3 text-xs text-slate-700">
-              ${sl.item}
-            </td>
-            <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
-              ${sl.date}
-            </td>
-            <td class="px-4 py-3 text-xs font-bold text-slate-800">
-              ${curr}${parseFloat(sl.amount).toFixed(2)}
-            </td>
-            <td class="px-4 py-3 text-right">
-              <button onclick="printSaleInvoice('${sl.id}')" title="Print Invoice" class="p-1 text-slate-400 hover:text-indigo-600">
-                <i data-lucide="printer" class="w-4 h-4 inline"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-      lucide.createIcons();
-    }
-
-    // Modal Handlers - Laptop
-    function openNewLaptopModal() {
-      document.getElementById('form-laptop').reset();
-      document.getElementById('laptop-id').value = '';
-      document.getElementById('modal-laptop-title').innerText = 'Add Laptop to Inventory';
-      document.getElementById('modal-laptop').classList.remove('hidden');
-    }
-
-    function editLaptop(id) {
-      const item = laptops.find(l => l.id === id);
-      if (!item) return;
-
-      document.getElementById('laptop-id').value = item.id;
-      document.getElementById('lap-brand').value = item.brand;
-      document.getElementById('lap-model').value = item.model;
-      document.getElementById('lap-cpu').value = item.cpu || '';
-      document.getElementById('lap-ram').value = item.ram || '';
-      document.getElementById('lap-storage').value = item.storage || '';
-      document.getElementById('lap-serial').value = item.serial || '';
-      document.getElementById('lap-condition').value = item.condition || 'Like New (99%)';
-      document.getElementById('lap-cost').value = item.cost;
-      document.getElementById('lap-price').value = item.price;
-      document.getElementById('lap-status').value = item.status || 'In Stock';
-      document.getElementById('lap-notes').value = item.notes || '';
-
-      document.getElementById('modal-laptop-title').innerText = 'Edit Laptop Specs';
-      document.getElementById('modal-laptop').classList.remove('hidden');
-    }
-
-    function handleSaveLaptop(e) {
-      e.preventDefault();
-      const id = document.getElementById('laptop-id').value;
-
-      const laptopData = {
-        id: id || ('lap_' + Date.now()),
-        brand: document.getElementById('lap-brand').value.trim(),
-        model: document.getElementById('lap-model').value.trim(),
-        cpu: document.getElementById('lap-cpu').value.trim(),
-        ram: document.getElementById('lap-ram').value.trim(),
-        storage: document.getElementById('lap-storage').value.trim(),
-        serial: document.getElementById('lap-serial').value.trim(),
-        condition: document.getElementById('lap-condition').value,
-        cost: parseFloat(document.getElementById('lap-cost').value) || 0,
-        price: parseFloat(document.getElementById('lap-price').value) || 0,
-        status: document.getElementById('lap-status').value,
-        notes: document.getElementById('lap-notes').value.trim()
-      };
-
-      if (id) {
-        const index = laptops.findIndex(l => l.id === id);
-        if (index !== -1) laptops[index] = laptopData;
-      } else {
-        laptops.unshift(laptopData);
-      }
-
-      saveLaptops();
-      closeModal('modal-laptop');
-      renderAll();
-    }
-
-    function deleteLaptop(id) {
-      if (confirm('Are you sure you want to remove this laptop from inventory?')) {
-        laptops = laptops.filter(l => l.id !== id);
-        saveLaptops();
-        renderAll();
-      }
-    }
-
-    // Modal Handlers - Ticket
     function openNewTicketModal() {
       document.getElementById('form-ticket').reset();
       document.getElementById('ticket-id').value = '';
@@ -1243,7 +1521,6 @@
       if (ticket) {
         ticket.status = newStatus;
         if (newStatus === 'Delivered') {
-          // Log into sales if fully delivered & paid
           const existingSale = sales.find(sl => sl.id === 'INV-' + ticket.id);
           if (!existingSale && ticket.cost > 0) {
             sales.unshift({
@@ -1271,7 +1548,61 @@
       }
     }
 
-    // Modal Handlers - Sell Laptop
+    // Sales Table
+    function renderSales() {
+      const curr = settings.currency || '$';
+      const search = (document.getElementById('sales-search')?.value || '').toLowerCase();
+
+      const filtered = sales.filter(item => {
+        return (
+          item.id.toLowerCase().includes(search) ||
+          item.customer.toLowerCase().includes(search) ||
+          item.item.toLowerCase().includes(search)
+        );
+      });
+
+      const tbody = document.getElementById('sales-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">No sales invoices logged yet</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(sl => {
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${sl.type === 'Laptop Sale' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}">
+                ${sl.type}
+              </span>
+            </td>
+            <td class="px-4 py-3 font-mono text-xs font-semibold text-slate-700">
+              ${sl.id}
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <div class="font-medium text-slate-800">${sl.customer}</div>
+              <div class="text-slate-400">${sl.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-700">
+              ${sl.item}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+              ${sl.date}
+            </td>
+            <td class="px-4 py-3 text-xs font-bold text-slate-800">
+              ${curr}${parseFloat(sl.amount).toFixed(2)}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <button onclick="printSaleInvoice('${sl.id}')" title="Print Invoice" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="printer" class="w-4 h-4 inline"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Sell Laptop
     function openSellModal(id) {
       const laptop = laptops.find(l => l.id === id);
       if (!laptop) return;
@@ -1317,7 +1648,7 @@
       printSaleInvoice(invoiceId);
     }
 
-    // Printable Job Sheet & Invoices
+    // Invoices & Job Cards
     function printJobSheet(ticketId) {
       const ticket = services.find(s => s.id === ticketId);
       if (!ticket) return;
@@ -1332,8 +1663,9 @@
               <img src="logo.png" alt="Ko Khant Logo" class="w-12 h-12 rounded-lg object-contain border border-slate-200" onerror="this.style.display='none'">
               <div>
                 <h2 class="text-xl font-bold tracking-tight text-slate-900">${settings.shopName}</h2>
-              <p class="text-xs text-slate-500">${settings.address}</p>
-              <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+                <p class="text-xs text-slate-500">${settings.address}</p>
+                <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+              </div>
             </div>
             <div class="text-right">
               <span class="inline-block px-3 py-1 bg-slate-900 text-white font-mono text-xs font-bold rounded">JOB CARD RECEIPT</span>
@@ -1408,8 +1740,9 @@
               <img src="logo.png" alt="Ko Khant Logo" class="w-12 h-12 rounded-lg object-contain border border-slate-200" onerror="this.style.display='none'">
               <div>
                 <h2 class="text-xl font-bold tracking-tight text-slate-900">${settings.shopName}</h2>
-              <p class="text-xs text-slate-500">${settings.address}</p>
-              <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+                <p class="text-xs text-slate-500">${settings.address}</p>
+                <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+              </div>
             </div>
             <div class="text-right">
               <span class="inline-block px-3 py-1 bg-indigo-600 text-white font-mono text-xs font-bold rounded">SALES INVOICE</span>
@@ -1554,135 +1887,6 @@
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
-  
-    // Access Permission Lock Logic
-    function isAppLocked() {
-      return settings.lockEnabled === true && sessionStorage.getItem('kokhant_unlocked') !== 'true';
-    }
-
-    function checkAppLockOnStartup() {
-      updateSecuritySettingsUI();
-      if (isAppLocked()) {
-        showLockScreen();
-      }
-    }
-
-    function showLockScreen() {
-      const lockScreen = document.getElementById('app-lock-screen');
-      const pinInput = document.getElementById('lock-pin-input');
-      const errorMsg = document.getElementById('lock-error-msg');
-      if (lockScreen) {
-        lockScreen.classList.remove('hidden');
-        errorMsg.classList.add('hidden');
-        pinInput.value = '';
-        setTimeout(() => pinInput.focus(), 100);
-      }
-    }
-
-    function lockApp() {
-      sessionStorage.removeItem('kokhant_unlocked');
-      showLockScreen();
-    }
-
-    function handleUnlockApp(e) {
-      e.preventDefault();
-      const enteredPin = document.getElementById('lock-pin-input').value;
-      const expectedPin = settings.appPin || '1234';
-      const errorMsg = document.getElementById('lock-error-msg');
-
-      if (enteredPin === expectedPin) {
-        sessionStorage.setItem('kokhant_unlocked', 'true');
-        document.getElementById('app-lock-screen').classList.add('hidden');
-        errorMsg.classList.add('hidden');
-      } else {
-        errorMsg.classList.remove('hidden');
-        document.getElementById('lock-pin-input').value = '';
-        document.getElementById('lock-pin-input').focus();
-      }
-    }
-
-    function toggleLockCheckbox(checked) {
-      const pinSection = document.getElementById('pin-config-section');
-      if (pinSection) {
-        pinSection.style.opacity = checked ? '1' : '0.5';
-      }
-    }
-
-    function updateSecuritySettingsUI() {
-      const isEnabled = settings.lockEnabled === true;
-      const chk = document.getElementById('setting-lock-enabled');
-      const badge = document.getElementById('lock-status-badge');
-      const pinInput = document.getElementById('setting-app-pin');
-      const pinConfirm = document.getElementById('setting-app-pin-confirm');
-
-      if (chk) chk.checked = isEnabled;
-      if (badge) {
-        badge.innerText = isEnabled ? 'Active PIN Lock' : 'Disabled';
-        badge.className = isEnabled 
-          ? 'px-2.5 py-1 text-xs rounded-full font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200'
-          : 'px-2.5 py-1 text-xs rounded-full font-semibold bg-slate-100 text-slate-600';
-      }
-      if (pinInput) pinInput.value = settings.appPin || '';
-      if (pinConfirm) pinConfirm.value = settings.appPin || '';
-      toggleLockCheckbox(isEnabled);
-    }
-
-    function saveSecuritySettings() {
-      const isEnabled = document.getElementById('setting-lock-enabled').checked;
-      const newPin = document.getElementById('setting-app-pin').value.trim();
-      const confirmPin = document.getElementById('setting-app-pin-confirm').value.trim();
-
-      if (isEnabled) {
-        if (!newPin) {
-          alert('Please enter a PIN (e.g. 4 digits like 1234) before enabling security lock.');
-          return;
-        }
-        if (newPin !== confirmPin) {
-          alert('PINs do not match! Please verify your PIN in both fields.');
-          return;
-        }
-        settings.lockEnabled = true;
-        settings.appPin = newPin;
-      } else {
-        settings.lockEnabled = false;
-      }
-
-      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
-      sessionStorage.setItem('kokhant_unlocked', 'true');
-      alert('Security lock settings saved successfully!');
-      updateSecuritySettingsUI();
-    }
-
   </script>
-  <!-- APP ACCESS LOCK SCREEN OVERLAY -->
-  <div id="app-lock-screen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border border-slate-100">
-      <div class="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-md shadow-indigo-500/10">
-        <i data-lucide="lock" class="w-8 h-8"></i>
-      </div>
-
-      <div>
-        <h3 class="text-xl font-bold text-slate-800 tracking-tight">Security Lock</h3>
-        <p class="text-xs text-slate-500 mt-1">Ko Khant (Lin Htet Phyo) Management Software</p>
-        <p class="text-xs text-slate-400 mt-0.5">Enter your PIN to access software records</p>
-      </div>
-
-      <form id="form-unlock" onsubmit="handleUnlockApp(event)" class="space-y-4">
-        <div>
-          <input type="password" id="lock-pin-input" autofocus autocomplete="off" placeholder="&bull; &bull; &bull; &bull;" maxlength="16" class="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
-          <p id="lock-error-msg" class="text-xs text-rose-500 font-medium mt-2 hidden">Incorrect PIN. Please try again.</p>
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition">
-          Unlock System
-        </button>
-      </form>
-
-      <div class="pt-2 border-t border-slate-100">
-        <p class="text-[11px] text-slate-400">Authorized personnel only &bull; Data encrypted locally</p>
-      </div>
-    </div>
-  </div>
-
 </body>
 </html>
