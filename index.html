@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ko Khant Management Software - Laptop Sales & Services</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-modal-content, #print-modal-content * {
+        visibility: visible;
+      }
+      #print-modal-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+  <!-- Application Shell -->
+  <div class="min-h-screen flex flex-col md:flex-row">
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-100 flex-shrink-0 flex flex-col justify-between shadow-xl">
+      <div>
+        <div class="p-6 border-b border-slate-800 flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-xl text-white shadow-lg shadow-indigo-500/30">
+            KK
+          </div>
+          <div>
+            <h1 class="font-bold text-lg tracking-tight leading-tight">Ko Khant</h1>
+            <p class="text-xs text-indigo-400 font-medium tracking-wide">Laptop & Service Hub</p>
+          </div>
+        </div>
+
+        <nav class="p-4 space-y-1">
+          <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-indigo-600 text-white shadow-sm">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span>Dashboard</span>
+          </button>
+          <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i data-lucide="laptop" class="w-5 h-5"></i>
+            <span>Laptop Inventory</span>
+          </button>
+          <button onclick="switchTab('services')" id="nav-services" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i data-lucide="wrench" class="w-5 h-5"></i>
+            <span>Repair & Service</span>
+          </button>
+          <button onclick="switchTab('sales')" id="nav-sales" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i data-lucide="receipt" class="w-5 h-5"></i>
+            <span>Sales & Invoices</span>
+          </button>
+          <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-300 hover:bg-slate-800 hover:text-white">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span>Settings & Backup</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-4 border-t border-slate-800">
+        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+          <div class="flex items-center space-x-2 text-xs text-slate-400 mb-1">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Ko Khant Software v1.2</span>
+          </div>
+          <p class="text-xs text-slate-400">Offline & LocalStorage Active</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+      <!-- Top Header -->
+      <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 id="page-title" class="text-2xl font-bold text-slate-800">Overview Dashboard</h2>
+          <p id="page-subtitle" class="text-xs sm:text-sm text-slate-500">Monitor your inventory, repairs, and daily financial metrics</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openNewLaptopModal()" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add Laptop</span>
+          </button>
+          <button onclick="openNewTicketModal()" class="inline-flex items-center space-x-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition">
+            <i data-lucide="wrench" class="w-4 h-4"></i>
+            <span>New Repair Ticket</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Viewports -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+        <!-- DASHBOARD TAB -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+          <!-- Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">In-Stock Laptops</p>
+                <h3 id="stat-instock" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                <p id="stat-inventory-val" class="text-xs text-slate-400 mt-1">Val: $0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <i data-lucide="laptop" class="w-6 h-6"></i>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Repairs</p>
+                <h3 id="stat-active-repairs" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                <p id="stat-pending-pickup" class="text-xs text-slate-400 mt-1">0 ready for pickup</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Laptops Sold</p>
+                <h3 id="stat-total-sales" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                <p id="stat-sales-revenue" class="text-xs text-slate-400 mt-1">Sales Rev: $0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <i data-lucide="badge-check" class="w-6 h-6"></i>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Combined Revenue</p>
+                <h3 id="stat-combined-rev" class="text-2xl font-bold text-indigo-900 mt-1">$0</h3>
+                <p id="stat-service-revenue" class="text-xs text-slate-400 mt-1">Service Rev: $0</p>
+              </div>
+              <div class="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600">
+                <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Overview Lists -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Urgent Repairs -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h4 class="font-semibold text-slate-800 text-sm flex items-center space-x-2">
+                  <i data-lucide="wrench" class="w-4 h-4 text-amber-500"></i>
+                  <span>Recent Ongoing Repairs</span>
+                </h4>
+                <button onclick="switchTab('services')" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">View All &rarr;</button>
+              </div>
+              <div id="dashboard-repairs-list" class="divide-y divide-slate-100 flex-1 p-2">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Recent Stock Laptops -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+              <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <h4 class="font-semibold text-slate-800 text-sm flex items-center space-x-2">
+                  <i data-lucide="laptop" class="w-4 h-4 text-indigo-500"></i>
+                  <span>Recently Added Laptops</span>
+                </h4>
+                <button onclick="switchTab('inventory')" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">View All &rarr;</button>
+              </div>
+              <div id="dashboard-stock-list" class="divide-y divide-slate-100 flex-1 p-2">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INVENTORY TAB -->
+        <section id="tab-inventory" class="tab-content hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+            <div class="relative flex-1 min-w-[240px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3.5 text-slate-400"></i>
+              <input type="text" id="inventory-search" oninput="renderLaptops()" placeholder="Search by brand, model, specs, serial no..." class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+            <div class="flex items-center space-x-3">
+              <select id="inventory-filter-status" onchange="renderLaptops()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="ALL">All Statuses</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Sold">Sold</option>
+                <option value="Reserved">Reserved</option>
+              </select>
+              <button onclick="openNewLaptopModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition flex items-center space-x-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Add Laptop</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th class="px-4 py-3">Device / Model</th>
+                  <th class="px-4 py-3">Specifications</th>
+                  <th class="px-4 py-3">Serial / Condition</th>
+                  <th class="px-4 py-3">Cost / Price</th>
+                  <th class="px-4 py-3">Margin</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body" class="divide-y divide-slate-100">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SERVICES / REPAIRS TAB -->
+        <section id="tab-services" class="tab-content hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+            <div class="relative flex-1 min-w-[240px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3.5 text-slate-400"></i>
+              <input type="text" id="service-search" oninput="renderServices()" placeholder="Search customer, phone, ticket ID, laptop model..." class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+            <div class="flex items-center space-x-3">
+              <select id="service-filter-status" onchange="renderServices()" class="text-sm border border-slate-200 rounded-lg px-3 py-2 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <option value="ALL">All Repair Stages</option>
+                <option value="Received">Received</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Waiting Parts">Waiting Parts</option>
+                <option value="Ready">Ready for Pickup</option>
+                <option value="Delivered">Delivered & Paid</option>
+              </select>
+              <button onclick="openNewTicketModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg shadow-sm transition flex items-center space-x-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>New Ticket</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th class="px-4 py-3">Ticket #</th>
+                  <th class="px-4 py-3">Customer Details</th>
+                  <th class="px-4 py-3">Device & Fault</th>
+                  <th class="px-4 py-3">Estimated / Deposit</th>
+                  <th class="px-4 py-3">Date</th>
+                  <th class="px-4 py-3">Status</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="services-table-body" class="divide-y divide-slate-100">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SALES & INVOICES TAB -->
+        <section id="tab-sales" class="tab-content hidden space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+            <div class="relative flex-1 min-w-[240px]">
+              <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3.5 text-slate-400"></i>
+              <input type="text" id="sales-search" oninput="renderSales()" placeholder="Search sold items, customer names, invoices..." class="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <th class="px-4 py-3">Type</th>
+                  <th class="px-4 py-3">Invoice / Ref #</th>
+                  <th class="px-4 py-3">Customer</th>
+                  <th class="px-4 py-3">Item / Service Details</th>
+                  <th class="px-4 py-3">Date</th>
+                  <th class="px-4 py-3">Amount</th>
+                  <th class="px-4 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sales-table-body" class="divide-y divide-slate-100">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SETTINGS & BACKUP TAB -->
+        <section id="tab-settings" class="tab-content hidden space-y-6 max-w-4xl">
+          <!-- Shop Info Settings -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-base text-slate-800">Business Profile & Receipts</h3>
+            <p class="text-xs text-slate-500">Details printed on your customer invoices and repair job cards.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Business Name</label>
+                <input type="text" id="setting-shop-name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Phone / WhatsApp</label>
+                <input type="text" id="setting-shop-phone" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Currency Symbol</label>
+                <input type="text" id="setting-shop-currency" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Address / Location</label>
+                <input type="text" id="setting-shop-address" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+            </div>
+            <div class="pt-2">
+              <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+                Save Business Profile
+              </button>
+            </div>
+          </div>
+
+          <!-- Data Backup & Restore -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <h3 class="font-bold text-base text-slate-800">Data Backup & Export (GitHub / Local)</h3>
+            <p class="text-xs text-slate-500">Easily export your inventory and repair records as a JSON backup file to commit to your GitHub repository or transfer to another computer.</p>
+            
+            <div class="flex flex-wrap gap-4 pt-2">
+              <button onclick="exportDataJSON()" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium shadow-sm transition">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Download Backup (JSON)</span>
+              </button>
+
+              <label class="inline-flex items-center space-x-2 px-4 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-sm font-medium cursor-pointer transition">
+                <i data-lucide="upload" class="w-4 h-4"></i>
+                <span>Restore Backup (JSON)</span>
+                <input type="file" id="import-json-file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+              </label>
+
+              <button onclick="resetToSampleData()" class="inline-flex items-center space-x-2 px-4 py-2.5 text-rose-600 hover:bg-rose-50 border border-rose-200 rounded-lg text-sm font-medium transition">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Load Sample Records</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: ADD / EDIT LAPTOP -->
+  <div id="modal-laptop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh] space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 id="modal-laptop-title" class="font-bold text-lg text-slate-800">Add Laptop to Inventory</h3>
+        <button onclick="closeModal('modal-laptop')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-laptop" onsubmit="handleSaveLaptop(event)" class="space-y-3">
+        <input type="hidden" id="laptop-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Brand *</label>
+            <input type="text" id="lap-brand" required placeholder="e.g. Dell, Lenovo, HP" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Model Name *</label>
+            <input type="text" id="lap-model" required placeholder="e.g. ThinkPad T14, XPS 13" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Processor (CPU)</label>
+            <input type="text" id="lap-cpu" placeholder="e.g. Core i5 11th" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">RAM</label>
+            <input type="text" id="lap-ram" placeholder="e.g. 16GB DDR4" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Storage</label>
+            <input type="text" id="lap-storage" placeholder="e.g. 512GB NVMe" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Serial Number (S/N)</label>
+            <input type="text" id="lap-serial" placeholder="Serial / Service Tag" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Condition</label>
+            <select id="lap-condition" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+              <option value="Like New (99%)">Like New (99%)</option>
+              <option value="Grade A Used">Grade A Used</option>
+              <option value="Grade B Used">Grade B Used</option>
+              <option value="Brand New">Brand New</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Cost Price *</label>
+            <input type="number" step="0.01" id="lap-cost" required placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Selling Price *</label>
+            <input type="number" step="0.01" id="lap-price" required placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Inventory Status</label>
+          <select id="lap-status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+            <option value="In Stock">In Stock</option>
+            <option value="Reserved">Reserved</option>
+            <option value="Sold">Sold</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Notes / Included Accessories</label>
+          <textarea id="lap-notes" rows="2" placeholder="e.g. Comes with original 65W charger, battery health 88%" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeModal('modal-laptop')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">Save Laptop</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT REPAIR TICKET -->
+  <div id="modal-ticket" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh] space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 id="modal-ticket-title" class="font-bold text-lg text-slate-800">New Repair Job Ticket</h3>
+        <button onclick="closeModal('modal-ticket')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-ticket" onsubmit="handleSaveTicket(event)" class="space-y-3">
+        <input type="hidden" id="ticket-id">
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Name *</label>
+            <input type="text" id="ticket-customer" required placeholder="Full Name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Phone *</label>
+            <input type="text" id="ticket-phone" required placeholder="09xxxxxxxxx / WhatsApp" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Device Model *</label>
+            <input type="text" id="ticket-device" required placeholder="e.g. Asus ROG G15 / MacBook Pro" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Serial No / Password</label>
+            <input type="text" id="ticket-serial" placeholder="S/N or Login Pass" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Problem / Reported Issue *</label>
+          <textarea id="ticket-issue" required rows="2" placeholder="e.g. No display, overheating, blue screen, keyboard replacement needed" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Estimated Cost</label>
+            <input type="number" step="0.01" id="ticket-cost" placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Advance Deposit</label>
+            <input type="number" step="0.01" id="ticket-deposit" placeholder="0.00" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Service Status</label>
+            <select id="ticket-status" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+              <option value="Received">Received</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Waiting Parts">Waiting Parts</option>
+              <option value="Ready">Ready for Pickup</option>
+              <option value="Delivered">Delivered & Paid</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Technician Diagnostic Notes</label>
+          <textarea id="ticket-tech-notes" rows="2" placeholder="Internal notes: Replaced motherboard IC, cleaned cooling fans..." class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeModal('modal-ticket')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm transition">Save Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: QUICK SELL LAPTOP -->
+  <div id="modal-sell" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="font-bold text-lg text-slate-800">Complete Laptop Sale</h3>
+        <button onclick="closeModal('modal-sell')" class="text-slate-400 hover:text-slate-600 p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-sell" onsubmit="handleConfirmSale(event)" class="space-y-3">
+        <input type="hidden" id="sell-laptop-id">
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+          <p id="sell-laptop-name" class="font-bold text-slate-800 text-sm">Laptop Model</p>
+          <p id="sell-laptop-specs" class="text-xs text-slate-500">Specs</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Full Name *</label>
+          <input type="text" id="sell-customer" required placeholder="Buyer name" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Customer Phone Number</label>
+          <input type="text" id="sell-phone" placeholder="09xxxxxxxxx" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Final Sale Amount *</label>
+          <input type="number" step="0.01" id="sell-final-price" required class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none font-semibold text-indigo-700">
+        </div>
+
+        <div class="pt-3 flex items-center justify-end space-x-3">
+          <button type="button" onclick="closeModal('modal-sell')" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm hover:bg-slate-50 transition">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium shadow-sm transition">Generate Invoice & Complete</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PRINT INVOICE & JOB CARD -->
+  <div id="modal-print" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[95vh] flex flex-col space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 no-print">
+        <h3 class="font-bold text-base text-slate-800">Print Preview Document</h3>
+        <div class="flex items-center space-x-2">
+          <button onclick="window.print()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-medium flex items-center space-x-1.5 transition">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Print or Save PDF</span>
+          </button>
+          <button onclick="closeModal('modal-print')" class="text-slate-400 hover:text-slate-600 p-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Printable area -->
+      <div id="print-modal-content" class="flex-1 overflow-y-auto p-4 bg-white border border-slate-200 rounded-xl">
+        <!-- Injected depending on ticket or invoice -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // LocalStorage Keys
+    const KEY_LAPTOPS = 'kokhant_laptops_v1';
+    const KEY_SERVICES = 'kokhant_services_v1';
+    const KEY_SALES = 'kokhant_sales_v1';
+    const KEY_SETTINGS = 'kokhant_settings_v1';
+
+    // State
+    let laptops = [];
+    let services = [];
+    let sales = [];
+    let settings = {
+      shopName: "Ko Khant Laptop Sales & Services",
+      phone: "+95 9 123 456 789",
+      currency: "$",
+      address: "Downtown Commercial Center, Tech Plaza Shop #12"
+    };
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderAll();
+      lucide.createIcons();
+    });
+
+    function loadState() {
+      const storedLaptops = localStorage.getItem(KEY_LAPTOPS);
+      const storedServices = localStorage.getItem(KEY_SERVICES);
+      const storedSales = localStorage.getItem(KEY_SALES);
+      const storedSettings = localStorage.getItem(KEY_SETTINGS);
+
+      if (storedSettings) {
+        settings = JSON.parse(storedSettings);
+      }
+
+      if (storedLaptops) {
+        laptops = JSON.parse(storedLaptops);
+      } else {
+        laptops = getDefaultLaptops();
+        saveLaptops();
+      }
+
+      if (storedServices) {
+        services = JSON.parse(storedServices);
+      } else {
+        services = getDefaultServices();
+        saveServices();
+      }
+
+      if (storedSales) {
+        sales = JSON.parse(storedSales);
+      } else {
+        sales = getDefaultSales();
+        saveSales();
+      }
+
+      // Populate settings form
+      document.getElementById('setting-shop-name').value = settings.shopName || '';
+      document.getElementById('setting-shop-phone').value = settings.phone || '';
+      document.getElementById('setting-shop-currency').value = settings.currency || '$';
+      document.getElementById('setting-shop-address').value = settings.address || '';
+    }
+
+    function saveLaptops() {
+      localStorage.setItem(KEY_LAPTOPS, JSON.stringify(laptops));
+    }
+    function saveServices() {
+      localStorage.setItem(KEY_SERVICES, JSON.stringify(services));
+    }
+    function saveSales() {
+      localStorage.setItem(KEY_SALES, JSON.stringify(sales));
+    }
+    function saveSettings() {
+      settings.shopName = document.getElementById('setting-shop-name').value.trim();
+      settings.phone = document.getElementById('setting-shop-phone').value.trim();
+      settings.currency = document.getElementById('setting-shop-currency').value.trim() || '$';
+      settings.address = document.getElementById('setting-shop-address').value.trim();
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+      alert('Business Profile Settings Saved Successfully!');
+      renderAll();
+    }
+
+    // Default Seed Data
+    function getDefaultLaptops() {
+      return [
+        {
+          id: 'lap_' + Date.now() + '_1',
+          brand: 'Lenovo',
+          model: 'ThinkPad T14 Gen 2',
+          cpu: 'Core i5-1135G7',
+          ram: '16GB DDR4',
+          storage: '512GB NVMe',
+          serial: 'PF-289XYZ',
+          condition: 'Grade A Used',
+          cost: 380,
+          price: 490,
+          status: 'In Stock',
+          notes: 'Tested battery 92%, backlit keyboard'
+        },
+        {
+          id: 'lap_' + Date.now() + '_2',
+          brand: 'Dell',
+          model: 'Latitude 5420',
+          cpu: 'Core i7-1185G7',
+          ram: '16GB DDR4',
+          storage: '512GB SSD',
+          serial: 'DEL-88203',
+          condition: 'Like New (99%)',
+          cost: 420,
+          price: 560,
+          status: 'In Stock',
+          notes: 'Original 65W Type-C adapter'
+        },
+        {
+          id: 'lap_' + Date.now() + '_3',
+          brand: 'Apple',
+          model: 'MacBook Air M1',
+          cpu: 'Apple M1 8-Core',
+          ram: '8GB Unified',
+          storage: '256GB SSD',
+          serial: 'C02G9988Q05D',
+          condition: 'Like New (99%)',
+          cost: 520,
+          price: 680,
+          status: 'Sold',
+          notes: 'Space Gray, battery cycle 45'
+        }
+      ];
+    }
+
+    function getDefaultServices() {
+      return [
+        {
+          id: 'SRV-1001',
+          customer: 'Aung Kyaw',
+          phone: '09798123456',
+          device: 'Asus TUF Gaming F15',
+          serial: 'N3NRCX01',
+          issue: 'Overheating during gameplay and sudden shutdowns. Needs thermal paste & fan replacement.',
+          cost: 45,
+          deposit: 15,
+          status: 'In Progress',
+          notes: 'Ordered replacement cooling fan. Heatsink cleaned.',
+          date: new Date().toISOString().split('T')[0]
+        },
+        {
+          id: 'SRV-1002',
+          customer: 'Daw Thinzar',
+          phone: '09450098765',
+          device: 'HP Pavilion 15',
+          serial: '5CD12984',
+          issue: 'Broken hinge and cracked front LCD bezel.',
+          cost: 60,
+          deposit: 30,
+          status: 'Ready',
+          notes: 'Hinge mounting epoxy rebuild complete. Display aligned.',
+          date: new Date().toISOString().split('T')[0]
+        }
+      ];
+    }
+
+    function getDefaultSales() {
+      return [
+        {
+          id: 'INV-2024-001',
+          type: 'Laptop Sale',
+          customer: 'Ko Min Min',
+          phone: '0997123984',
+          item: 'Apple MacBook Air M1 (8GB/256GB)',
+          amount: 680,
+          date: new Date().toISOString().split('T')[0]
+        }
+      ];
+    }
+
+    // Switch Tabs
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+        btn.classList.add('text-slate-300', 'hover:bg-slate-800', 'hover:text-white');
+      });
+
+      const selectedTab = document.getElementById(`tab-${tabName}`);
+      const selectedNav = document.getElementById(`nav-${tabName}`);
+      if (selectedTab) selectedTab.classList.remove('hidden');
+      if (selectedNav) {
+        selectedNav.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+        selectedNav.classList.remove('text-slate-300', 'hover:bg-slate-800');
+      }
+
+      const titles = {
+        dashboard: ['Overview Dashboard', 'Monitor your inventory, repairs, and daily financial metrics'],
+        inventory: ['Laptop Inventory', 'Manage in-stock laptops, specifications, cost, and sales listings'],
+        services: ['Repair & Service Tickets', 'Track workbench repair status, diagnostics, and customer receipts'],
+        sales: ['Sales & Billing Log', 'Record of completed laptop sales and paid repair invoices'],
+        settings: ['System Settings & Backups', 'Configure shop metadata and export/import offline JSON records']
+      };
+
+      if (titles[tabName]) {
+        document.getElementById('page-title').innerText = titles[tabName][0];
+        document.getElementById('page-subtitle').innerText = titles[tabName][1];
+      }
+      lucide.createIcons();
+    }
+
+    // Render Master
+    function renderAll() {
+      renderDashboard();
+      renderLaptops();
+      renderServices();
+      renderSales();
+      lucide.createIcons();
+    }
+
+    // Dashboard
+    function renderDashboard() {
+      const curr = settings.currency || '$';
+      const inStockList = laptops.filter(l => l.status === 'In Stock');
+      const inStockCount = inStockList.length;
+      const inventoryVal = inStockList.reduce((acc, l) => acc + (parseFloat(l.cost) || 0), 0);
+
+      const activeRepairs = services.filter(s => s.status !== 'Delivered');
+      const pendingPickup = services.filter(s => s.status === 'Ready').length;
+
+      const soldLaptops = laptops.filter(l => l.status === 'Sold').length;
+      const salesRev = sales.filter(s => s.type === 'Laptop Sale').reduce((acc, s) => acc + (parseFloat(s.amount) || 0), 0);
+      const serviceRev = sales.filter(s => s.type === 'Repair Service').reduce((acc, s) => acc + (parseFloat(s.amount) || 0), 0);
+      const combinedRev = salesRev + serviceRev;
+
+      document.getElementById('stat-instock').innerText = inStockCount;
+      document.getElementById('stat-inventory-val').innerText = `Valuation: ${curr}${inventoryVal.toLocaleString()}`;
+
+      document.getElementById('stat-active-repairs').innerText = activeRepairs.length;
+      document.getElementById('stat-pending-pickup').innerText = `${pendingPickup} ready for pickup`;
+
+      document.getElementById('stat-total-sales').innerText = soldLaptops;
+      document.getElementById('stat-sales-revenue').innerText = `Laptop Rev: ${curr}${salesRev.toLocaleString()}`;
+
+      document.getElementById('stat-combined-rev').innerText = `${curr}${combinedRev.toLocaleString()}`;
+      document.getElementById('stat-service-revenue').innerText = `Service Rev: ${curr}${serviceRev.toLocaleString()}`;
+
+      // Dashboard mini lists
+      const repairsListEl = document.getElementById('dashboard-repairs-list');
+      if (activeRepairs.length === 0) {
+        repairsListEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No active repair jobs in queue</div>`;
+      } else {
+        repairsListEl.innerHTML = activeRepairs.slice(0, 4).map(s => `
+          <div class="py-2.5 px-3 flex items-center justify-between hover:bg-slate-50 transition rounded-lg">
+            <div class="truncate mr-2">
+              <p class="font-medium text-xs text-slate-800">${s.customer} &bull; <span class="text-slate-500">${s.device}</span></p>
+              <p class="text-xs text-slate-400 truncate">${s.issue}</p>
+            </div>
+            <span class="px-2 py-0.5 text-[11px] rounded-full font-medium ${getStatusBadge(s.status)}">${s.status}</span>
+          </div>
+        `).join('');
+      }
+
+      const stockListEl = document.getElementById('dashboard-stock-list');
+      if (inStockList.length === 0) {
+        stockListEl.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No laptops currently in stock</div>`;
+      } else {
+        stockListEl.innerHTML = inStockList.slice(0, 4).map(l => `
+          <div class="py-2.5 px-3 flex items-center justify-between hover:bg-slate-50 transition rounded-lg">
+            <div class="truncate mr-2">
+              <p class="font-medium text-xs text-slate-800">${l.brand} ${l.model}</p>
+              <p class="text-xs text-slate-400">${l.cpu} &bull; ${l.ram} &bull; ${l.storage}</p>
+            </div>
+            <p class="font-bold text-xs text-indigo-600">${curr}${parseFloat(l.price).toFixed(2)}</p>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Render Laptops Table
+    function renderLaptops() {
+      const curr = settings.currency || '$';
+      const search = (document.getElementById('inventory-search')?.value || '').toLowerCase();
+      const statusFilter = document.getElementById('inventory-filter-status')?.value || 'ALL';
+
+      const filtered = laptops.filter(item => {
+        const matchesSearch = 
+          item.brand.toLowerCase().includes(search) ||
+          item.model.toLowerCase().includes(search) ||
+          (item.cpu && item.cpu.toLowerCase().includes(search)) ||
+          (item.serial && item.serial.toLowerCase().includes(search));
+        const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      const tbody = document.getElementById('inventory-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">No laptop records found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(l => {
+        const cost = parseFloat(l.cost) || 0;
+        const price = parseFloat(l.price) || 0;
+        const margin = price - cost;
+        const marginPct = cost > 0 ? Math.round((margin / cost) * 100) : 0;
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3">
+              <div class="font-semibold text-slate-800">${l.brand} ${l.model}</div>
+              <div class="text-xs text-slate-400">${l.notes || 'No extra notes'}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-600">
+              <div>${l.cpu || '-'}</div>
+              <div class="text-slate-400">${l.ram || ''} | ${l.storage || ''}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-600">
+              <span class="font-mono text-slate-500">${l.serial || 'N/A'}</span>
+              <div class="text-slate-400">${l.condition}</div>
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <div class="font-semibold text-slate-800">${curr}${price.toFixed(2)}</div>
+              <div class="text-slate-400">Cost: ${curr}${cost.toFixed(2)}</div>
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium ${margin >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">
+                +${curr}${margin.toFixed(2)} (${marginPct}%)
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <span class="px-2.5 py-1 text-xs rounded-full font-medium ${getStatusBadge(l.status)}">${l.status}</span>
+            </td>
+            <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+              ${l.status === 'In Stock' ? `
+                <button onclick="openSellModal('${l.id}')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded text-xs font-semibold">
+                  Sell
+                </button>
+              ` : ''}
+              <button onclick="editLaptop('${l.id}')" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="edit-3" class="w-4 h-4 inline"></i>
+              </button>
+              <button onclick="deleteLaptop('${l.id}')" class="p-1 text-slate-400 hover:text-rose-600">
+                <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Render Repair Services Table
+    function renderServices() {
+      const curr = settings.currency || '$';
+      const search = (document.getElementById('service-search')?.value || '').toLowerCase();
+      const statusFilter = document.getElementById('service-filter-status')?.value || 'ALL';
+
+      const filtered = services.filter(item => {
+        const matchesSearch = 
+          item.customer.toLowerCase().includes(search) ||
+          item.phone.toLowerCase().includes(search) ||
+          item.device.toLowerCase().includes(search) ||
+          item.id.toLowerCase().includes(search);
+        const matchesStatus = statusFilter === 'ALL' || item.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+
+      const tbody = document.getElementById('services-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">No service tickets found</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const cost = parseFloat(s.cost) || 0;
+        const dep = parseFloat(s.deposit) || 0;
+        const balance = Math.max(0, cost - dep);
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3 font-mono font-medium text-xs text-indigo-600">
+              ${s.id}
+            </td>
+            <td class="px-4 py-3">
+              <div class="font-semibold text-slate-800">${s.customer}</div>
+              <div class="text-xs text-slate-400">${s.phone}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-700 max-w-xs">
+              <div class="font-medium text-slate-800">${s.device}</div>
+              <div class="text-slate-500 truncate" title="${s.issue}">${s.issue}</div>
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <div class="font-semibold text-slate-800">${curr}${cost.toFixed(2)}</div>
+              <div class="text-slate-400">Dep: ${curr}${dep.toFixed(2)} | Bal: ${curr}${balance.toFixed(2)}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+              ${s.date || 'Today'}
+            </td>
+            <td class="px-4 py-3">
+              <select onchange="updateServiceStatus('${s.id}', this.value)" class="text-xs font-medium rounded-full px-2.5 py-1 border-0 focus:ring-2 focus:ring-indigo-500 cursor-pointer ${getStatusBadge(s.status)}">
+                <option value="Received" ${s.status === 'Received' ? 'selected' : ''}>Received</option>
+                <option value="In Progress" ${s.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                <option value="Waiting Parts" ${s.status === 'Waiting Parts' ? 'selected' : ''}>Waiting Parts</option>
+                <option value="Ready" ${s.status === 'Ready' ? 'selected' : ''}>Ready</option>
+                <option value="Delivered" ${s.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+              </select>
+            </td>
+            <td class="px-4 py-3 text-right space-x-1 whitespace-nowrap">
+              <button onclick="printJobSheet('${s.id}')" title="Print Job Card Receipt" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="printer" class="w-4 h-4 inline"></i>
+              </button>
+              <button onclick="editTicket('${s.id}')" title="Edit Ticket" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="edit-3" class="w-4 h-4 inline"></i>
+              </button>
+              <button onclick="deleteService('${s.id}')" title="Delete Ticket" class="p-1 text-slate-400 hover:text-rose-600">
+                <i data-lucide="trash-2" class="w-4 h-4 inline"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Render Sales Invoices Table
+    function renderSales() {
+      const curr = settings.currency || '$';
+      const search = (document.getElementById('sales-search')?.value || '').toLowerCase();
+
+      const filtered = sales.filter(item => {
+        return (
+          item.id.toLowerCase().includes(search) ||
+          item.customer.toLowerCase().includes(search) ||
+          item.item.toLowerCase().includes(search)
+        );
+      });
+
+      const tbody = document.getElementById('sales-table-body');
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400 text-sm">No sales invoices logged yet</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(sl => {
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-4 py-3">
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${sl.type === 'Laptop Sale' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}">
+                ${sl.type}
+              </span>
+            </td>
+            <td class="px-4 py-3 font-mono text-xs font-semibold text-slate-700">
+              ${sl.id}
+            </td>
+            <td class="px-4 py-3 text-xs">
+              <div class="font-medium text-slate-800">${sl.customer}</div>
+              <div class="text-slate-400">${sl.phone || '-'}</div>
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-700">
+              ${sl.item}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">
+              ${sl.date}
+            </td>
+            <td class="px-4 py-3 text-xs font-bold text-slate-800">
+              ${curr}${parseFloat(sl.amount).toFixed(2)}
+            </td>
+            <td class="px-4 py-3 text-right">
+              <button onclick="printSaleInvoice('${sl.id}')" title="Print Invoice" class="p-1 text-slate-400 hover:text-indigo-600">
+                <i data-lucide="printer" class="w-4 h-4 inline"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    // Modal Handlers - Laptop
+    function openNewLaptopModal() {
+      document.getElementById('form-laptop').reset();
+      document.getElementById('laptop-id').value = '';
+      document.getElementById('modal-laptop-title').innerText = 'Add Laptop to Inventory';
+      document.getElementById('modal-laptop').classList.remove('hidden');
+    }
+
+    function editLaptop(id) {
+      const item = laptops.find(l => l.id === id);
+      if (!item) return;
+
+      document.getElementById('laptop-id').value = item.id;
+      document.getElementById('lap-brand').value = item.brand;
+      document.getElementById('lap-model').value = item.model;
+      document.getElementById('lap-cpu').value = item.cpu || '';
+      document.getElementById('lap-ram').value = item.ram || '';
+      document.getElementById('lap-storage').value = item.storage || '';
+      document.getElementById('lap-serial').value = item.serial || '';
+      document.getElementById('lap-condition').value = item.condition || 'Like New (99%)';
+      document.getElementById('lap-cost').value = item.cost;
+      document.getElementById('lap-price').value = item.price;
+      document.getElementById('lap-status').value = item.status || 'In Stock';
+      document.getElementById('lap-notes').value = item.notes || '';
+
+      document.getElementById('modal-laptop-title').innerText = 'Edit Laptop Specs';
+      document.getElementById('modal-laptop').classList.remove('hidden');
+    }
+
+    function handleSaveLaptop(e) {
+      e.preventDefault();
+      const id = document.getElementById('laptop-id').value;
+
+      const laptopData = {
+        id: id || ('lap_' + Date.now()),
+        brand: document.getElementById('lap-brand').value.trim(),
+        model: document.getElementById('lap-model').value.trim(),
+        cpu: document.getElementById('lap-cpu').value.trim(),
+        ram: document.getElementById('lap-ram').value.trim(),
+        storage: document.getElementById('lap-storage').value.trim(),
+        serial: document.getElementById('lap-serial').value.trim(),
+        condition: document.getElementById('lap-condition').value,
+        cost: parseFloat(document.getElementById('lap-cost').value) || 0,
+        price: parseFloat(document.getElementById('lap-price').value) || 0,
+        status: document.getElementById('lap-status').value,
+        notes: document.getElementById('lap-notes').value.trim()
+      };
+
+      if (id) {
+        const index = laptops.findIndex(l => l.id === id);
+        if (index !== -1) laptops[index] = laptopData;
+      } else {
+        laptops.unshift(laptopData);
+      }
+
+      saveLaptops();
+      closeModal('modal-laptop');
+      renderAll();
+    }
+
+    function deleteLaptop(id) {
+      if (confirm('Are you sure you want to remove this laptop from inventory?')) {
+        laptops = laptops.filter(l => l.id !== id);
+        saveLaptops();
+        renderAll();
+      }
+    }
+
+    // Modal Handlers - Ticket
+    function openNewTicketModal() {
+      document.getElementById('form-ticket').reset();
+      document.getElementById('ticket-id').value = '';
+      document.getElementById('modal-ticket-title').innerText = 'New Repair Job Ticket';
+      document.getElementById('modal-ticket').classList.remove('hidden');
+    }
+
+    function editTicket(id) {
+      const s = services.find(x => x.id === id);
+      if (!s) return;
+
+      document.getElementById('ticket-id').value = s.id;
+      document.getElementById('ticket-customer').value = s.customer;
+      document.getElementById('ticket-phone').value = s.phone;
+      document.getElementById('ticket-device').value = s.device;
+      document.getElementById('ticket-serial').value = s.serial || '';
+      document.getElementById('ticket-issue').value = s.issue;
+      document.getElementById('ticket-cost').value = s.cost || '';
+      document.getElementById('ticket-deposit').value = s.deposit || '';
+      document.getElementById('ticket-status').value = s.status || 'Received';
+      document.getElementById('ticket-tech-notes').value = s.notes || '';
+
+      document.getElementById('modal-ticket-title').innerText = `Edit Ticket: ${s.id}`;
+      document.getElementById('modal-ticket').classList.remove('hidden');
+    }
+
+    function handleSaveTicket(e) {
+      e.preventDefault();
+      const id = document.getElementById('ticket-id').value;
+
+      const ticketData = {
+        id: id || ('SRV-' + Math.floor(1000 + Math.random() * 9000)),
+        customer: document.getElementById('ticket-customer').value.trim(),
+        phone: document.getElementById('ticket-phone').value.trim(),
+        device: document.getElementById('ticket-device').value.trim(),
+        serial: document.getElementById('ticket-serial').value.trim(),
+        issue: document.getElementById('ticket-issue').value.trim(),
+        cost: parseFloat(document.getElementById('ticket-cost').value) || 0,
+        deposit: parseFloat(document.getElementById('ticket-deposit').value) || 0,
+        status: document.getElementById('ticket-status').value,
+        notes: document.getElementById('ticket-tech-notes').value.trim(),
+        date: id ? (services.find(s => s.id === id)?.date || new Date().toISOString().split('T')[0]) : new Date().toISOString().split('T')[0]
+      };
+
+      if (id) {
+        const index = services.findIndex(s => s.id === id);
+        if (index !== -1) services[index] = ticketData;
+      } else {
+        services.unshift(ticketData);
+      }
+
+      saveServices();
+      closeModal('modal-ticket');
+      renderAll();
+    }
+
+    function updateServiceStatus(id, newStatus) {
+      const ticket = services.find(s => s.id === id);
+      if (ticket) {
+        ticket.status = newStatus;
+        if (newStatus === 'Delivered') {
+          // Log into sales if fully delivered & paid
+          const existingSale = sales.find(sl => sl.id === 'INV-' + ticket.id);
+          if (!existingSale && ticket.cost > 0) {
+            sales.unshift({
+              id: 'INV-' + ticket.id,
+              type: 'Repair Service',
+              customer: ticket.customer,
+              phone: ticket.phone,
+              item: `Repair Service for ${ticket.device} (${ticket.issue.substring(0, 30)}...)`,
+              amount: ticket.cost,
+              date: new Date().toISOString().split('T')[0]
+            });
+            saveSales();
+          }
+        }
+        saveServices();
+        renderAll();
+      }
+    }
+
+    function deleteService(id) {
+      if (confirm('Delete this repair service record?')) {
+        services = services.filter(s => s.id !== id);
+        saveServices();
+        renderAll();
+      }
+    }
+
+    // Modal Handlers - Sell Laptop
+    function openSellModal(id) {
+      const laptop = laptops.find(l => l.id === id);
+      if (!laptop) return;
+
+      document.getElementById('sell-laptop-id').value = laptop.id;
+      document.getElementById('sell-laptop-name').innerText = `${laptop.brand} ${laptop.model}`;
+      document.getElementById('sell-laptop-specs').innerText = `${laptop.cpu || ''} | ${laptop.ram || ''} | ${laptop.storage || ''} (S/N: ${laptop.serial || 'N/A'})`;
+      document.getElementById('sell-final-price').value = laptop.price;
+      document.getElementById('sell-customer').value = '';
+      document.getElementById('sell-phone').value = '';
+
+      document.getElementById('modal-sell').classList.remove('hidden');
+    }
+
+    function handleConfirmSale(e) {
+      e.preventDefault();
+      const id = document.getElementById('sell-laptop-id').value;
+      const laptop = laptops.find(l => l.id === id);
+      if (!laptop) return;
+
+      const customer = document.getElementById('sell-customer').value.trim();
+      const phone = document.getElementById('sell-phone').value.trim();
+      const finalPrice = parseFloat(document.getElementById('sell-final-price').value) || laptop.price;
+
+      laptop.status = 'Sold';
+      saveLaptops();
+
+      const invoiceId = 'INV-' + Date.now().toString().slice(-6);
+      const newSale = {
+        id: invoiceId,
+        type: 'Laptop Sale',
+        customer: customer,
+        phone: phone,
+        item: `${laptop.brand} ${laptop.model} (${laptop.cpu || ''}, ${laptop.ram || ''}, ${laptop.storage || ''})`,
+        amount: finalPrice,
+        date: new Date().toISOString().split('T')[0]
+      };
+      sales.unshift(newSale);
+      saveSales();
+
+      closeModal('modal-sell');
+      renderAll();
+      printSaleInvoice(invoiceId);
+    }
+
+    // Printable Job Sheet & Invoices
+    function printJobSheet(ticketId) {
+      const ticket = services.find(s => s.id === ticketId);
+      if (!ticket) return;
+
+      const curr = settings.currency || '$';
+      const balance = Math.max(0, ticket.cost - ticket.deposit);
+
+      const html = `
+        <div class="space-y-6 text-slate-800">
+          <div class="flex justify-between items-start border-b pb-4">
+            <div>
+              <h2 class="text-xl font-bold tracking-tight text-slate-900">${settings.shopName}</h2>
+              <p class="text-xs text-slate-500">${settings.address}</p>
+              <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+            </div>
+            <div class="text-right">
+              <span class="inline-block px-3 py-1 bg-slate-900 text-white font-mono text-xs font-bold rounded">JOB CARD RECEIPT</span>
+              <p class="text-sm font-mono font-bold mt-1">${ticket.id}</p>
+              <p class="text-xs text-slate-400">Date: ${ticket.date}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <div>
+              <p class="font-semibold text-slate-400 uppercase">Customer Info</p>
+              <p class="font-bold text-sm text-slate-800">${ticket.customer}</p>
+              <p class="text-slate-600">Phone: ${ticket.phone}</p>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-400 uppercase">Device Info</p>
+              <p class="font-bold text-sm text-slate-800">${ticket.device}</p>
+              <p class="text-slate-600">S/N or Login: ${ticket.serial || 'N/A'}</p>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <h4 class="text-xs font-bold uppercase text-slate-500">Reported Problem & Diagnostics</h4>
+            <div class="p-3 bg-slate-50 rounded-lg text-sm border border-slate-100 text-slate-700">
+              ${ticket.issue}
+            </div>
+            ${ticket.notes ? `
+              <div class="text-xs text-slate-500 mt-1">
+                <span class="font-semibold">Technician Note:</span> ${ticket.notes}
+              </div>
+            ` : ''}
+          </div>
+
+          <div class="border-t pt-3 flex justify-between items-center text-sm">
+            <div>
+              <p class="text-xs text-slate-400">Current Status: <span class="font-bold text-slate-700">${ticket.status}</span></p>
+            </div>
+            <div class="text-right space-y-1">
+              <div class="text-xs text-slate-500">Est. Total: <span class="font-semibold text-slate-800">${curr}${ticket.cost.toFixed(2)}</span></div>
+              <div class="text-xs text-slate-500">Advance Paid: <span class="font-semibold text-emerald-600">${curr}${ticket.deposit.toFixed(2)}</span></div>
+              <div class="text-base font-bold text-indigo-700">Balance Due: ${curr}${balance.toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div class="border-t border-dashed pt-6 text-[10px] text-slate-400 flex justify-between">
+            <div class="space-y-1">
+              <p>1. Please bring this receipt for device pickup.</p>
+              <p>2. Goods not collected within 45 days will be disposed of.</p>
+            </div>
+            <div class="text-center pt-6 border-t border-slate-300 w-36">
+              Authorized Signature
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('print-modal-content').innerHTML = html;
+      document.getElementById('modal-print').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function printSaleInvoice(invoiceId) {
+      const sale = sales.find(s => s.id === invoiceId);
+      if (!sale) return;
+
+      const curr = settings.currency || '$';
+
+      const html = `
+        <div class="space-y-6 text-slate-800">
+          <div class="flex justify-between items-start border-b pb-4">
+            <div>
+              <h2 class="text-xl font-bold tracking-tight text-slate-900">${settings.shopName}</h2>
+              <p class="text-xs text-slate-500">${settings.address}</p>
+              <p class="text-xs text-slate-500">Phone: ${settings.phone}</p>
+            </div>
+            <div class="text-right">
+              <span class="inline-block px-3 py-1 bg-indigo-600 text-white font-mono text-xs font-bold rounded">SALES INVOICE</span>
+              <p class="text-sm font-mono font-bold mt-1">${sale.id}</p>
+              <p class="text-xs text-slate-400">Date: ${sale.date}</p>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <p class="text-xs font-semibold text-slate-400 uppercase">Billed To:</p>
+            <p class="font-bold text-sm text-slate-800">${sale.customer}</p>
+            <p class="text-xs text-slate-600">${sale.phone || 'Walk-in Client'}</p>
+          </div>
+
+          <table class="w-full text-left text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-xs font-semibold text-slate-400 uppercase">
+                <th class="py-2">Description</th>
+                <th class="py-2 text-right">Qty</th>
+                <th class="py-2 text-right">Price</th>
+                <th class="py-2 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr>
+                <td class="py-3 font-medium text-slate-800">
+                  ${sale.item}
+                </td>
+                <td class="py-3 text-right">1</td>
+                <td class="py-3 text-right">${curr}${parseFloat(sale.amount).toFixed(2)}</td>
+                <td class="py-3 text-right font-bold">${curr}${parseFloat(sale.amount).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="border-t pt-4 flex justify-between items-start">
+            <div class="text-xs text-slate-400 max-w-xs">
+              <p class="font-semibold text-slate-600 mb-1">Warranty Policy:</p>
+              <p>Hardware testing warranty valid for 1 month from purchase date. Physical damage, liquid spills, or altered warranty stickers void warranty.</p>
+            </div>
+            <div class="text-right space-y-1">
+              <div class="text-xs text-slate-400">Payment Status: <span class="font-semibold text-emerald-600">PAID IN FULL</span></div>
+              <div class="text-lg font-extrabold text-slate-900">Total: ${curr}${parseFloat(sale.amount).toFixed(2)}</div>
+            </div>
+          </div>
+
+          <div class="border-t border-dashed pt-8 text-[10px] text-slate-400 flex justify-between items-end">
+            <div>Thank you for choosing ${settings.shopName}!</div>
+            <div class="text-center pt-6 border-t border-slate-300 w-36">
+              Shop Signature / Stamp
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('print-modal-content').innerHTML = html;
+      document.getElementById('modal-print').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // Backup & Restore
+    function exportDataJSON() {
+      const bundle = {
+        app: "Ko Khant Management Software",
+        exportDate: new Date().toISOString(),
+        settings: settings,
+        laptops: laptops,
+        services: services,
+        sales: sales
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bundle, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const filename = `KoKhant_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importDataJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.laptops && parsed.services) {
+            laptops = parsed.laptops || [];
+            services = parsed.services || [];
+            sales = parsed.sales || [];
+            if (parsed.settings) settings = parsed.settings;
+
+            saveLaptops();
+            saveServices();
+            saveSales();
+            localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+
+            alert('Data restored successfully!');
+            loadState();
+            renderAll();
+          } else {
+            alert('Invalid backup file format.');
+          }
+        } catch (err) {
+          alert('Failed to parse backup JSON file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetToSampleData() {
+      if (confirm('Load fresh demo sample data? Current unsaved custom rows will be overwritten.')) {
+        laptops = getDefaultLaptops();
+        services = getDefaultServices();
+        sales = getDefaultSales();
+        saveLaptops();
+        saveServices();
+        saveSales();
+        renderAll();
+        alert('Sample records reloaded.');
+      }
+    }
+
+    // Helper Badges
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'In Stock': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        case 'Sold': return 'bg-slate-100 text-slate-700 border border-slate-200';
+        case 'Reserved': return 'bg-purple-50 text-purple-700 border border-purple-200';
+        case 'Received': return 'bg-sky-50 text-sky-700 border border-sky-200';
+        case 'In Progress': return 'bg-amber-50 text-amber-700 border border-amber-200';
+        case 'Waiting Parts': return 'bg-orange-50 text-orange-700 border border-orange-200';
+        case 'Ready': return 'bg-teal-50 text-teal-700 border border-teal-200';
+        case 'Delivered': return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+        default: return 'bg-slate-100 text-slate-600';
+      }
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
