@@ -3,9 +3,10 @@
 A standalone web application designed for laptop retail shops and repair centers with dual role-based security.
 
 ## 🚀 Key Features
+- **1-Hour Admin Auto-Lock**: Admin rights automatically expire after 1 hour of session time. Once expired, modifying stock, changing prices, or adding laptops prompts for the Admin password.
 - **Dual Role Access Control (Admin vs Staff)**:
   - **Admin Mode**: Full control to add new laptops, edit stock specifications, modify purchase costs, view profit margins, delete records, and configure settings.
-  - **Staff Mode**: Staff can create repair tickets, update repair job status, sell laptops, and print invoices/receipts, but **purchase cost and profit margins are masked (`••••`)**, and stock cannot be added or edited without entering the Admin Password.
+  - **Staff Mode**: Staff can create repair tickets, update repair job status, sell laptops, and print invoices/receipts, but **purchase costs and profit margins are masked (`••••`)**, and stock cannot be added or edited without entering the Admin Password.
 - **Laptop Inventory Tracking**: Specs, Serial/Service tags, purchase cost, retail price, and automated margin calculations.
 - **Service & Repair Job Tickets**: Complete workbench tracking from diagnosis, waiting for spare parts, ready for pickup, to delivered.
 - **Sales & Customer Invoices**: Generates clean, printable invoices and repair job sheets with your shop's custom branding.

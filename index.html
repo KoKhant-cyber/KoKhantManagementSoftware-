@@ -742,7 +742,8 @@
       staffPin: "1234",       // Default Staff PIN
       requireAdminToAddStock: true, // Only admin can add/edit/delete laptop stock
       hideCostFromStaff: true,      // Hide cost & margin in staff mode
-      lockOnOpen: false
+      lockOnOpen: false,
+      adminTimeoutMinutes: 60
     };
 
     // Initialize
@@ -851,7 +852,7 @@
           <div class="flex items-center space-x-2">
             <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
               <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-600"></i>
-              <span>Admin Mode (Full Access)</span>
+              <span>Admin Mode (${getAdminRemainingMinutes()}m left)</span>
             </span>
             <button onclick="lockToStaffMode()" class="text-xs font-semibold text-slate-500 hover:text-slate-800 underline px-1.5 py-1">
               Lock to Staff
@@ -916,8 +917,41 @@
       }
     }
 
-    function requireAdminAuth(callback, reasonText) {
+    
+    // 1-Hour Admin Session Expiry Logic
+    function getAdminRemainingMinutes() {
+      if (currentRole !== 'admin') return 0;
+      const unlockedAt = parseInt(sessionStorage.getItem('kokhant_admin_unlocked_at') || '0', 10);
+      if (!unlockedAt) return 0;
+      const durationMs = (settings.adminTimeoutMinutes || 60) * 60 * 1000;
+      const elapsed = Date.now() - unlockedAt;
+      const remainingMs = durationMs - elapsed;
+      return remainingMs > 0 ? Math.ceil(remainingMs / (60 * 1000)) : 0;
+    }
+
+    function checkAdminSessionValidity() {
+      if (currentRole !== 'admin') return false;
+      const remaining = getAdminRemainingMinutes();
+      if (remaining <= 0) {
+        lockToStaffMode();
+        return false;
+      }
+      return true;
+    }
+
+    // Auto-check session timeout every 30 seconds
+    setInterval(() => {
       if (currentRole === 'admin') {
+        if (!checkAdminSessionValidity()) {
+          alert('Admin session has reached its 1-hour limit. Re-enter your Admin password to change or add items.');
+        } else {
+          updateRoleUI();
+        }
+      }
+    }, 30000);
+
+    function requireAdminAuth(callback, reasonText) {
+      if (currentRole === 'admin' && checkAdminSessionValidity()) {
         callback();
         return;
       }
@@ -951,6 +985,7 @@
       if (entered === expected) {
         currentRole = 'admin';
         sessionStorage.setItem('kokhant_role', 'admin');
+        sessionStorage.setItem('kokhant_admin_unlocked_at', Date.now().toString());
         closeAdminAuthModal();
         updateRoleUI();
         renderAll();
@@ -988,6 +1023,7 @@
       if (input === adminPwd) {
         currentRole = 'admin';
         sessionStorage.setItem('kokhant_role', 'admin');
+        sessionStorage.setItem('kokhant_admin_unlocked_at', Date.now().toString());
         sessionStorage.setItem('kokhant_unlocked', 'true');
         document.getElementById('app-startup-lock-screen').classList.add('hidden');
         updateRoleUI();
