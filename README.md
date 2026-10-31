@@ -1,4 +1,4 @@
-# Ko Khant Management Software (Laptop Sales & Repair Services)
+# Ko Khant (Lin Htet Phyo) Management Software (Laptop Sales & Repair Services)
 
 A standalone web application designed for laptop retail shops and repair centers.
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ko Khant Management Software - Laptop Sales & Services</title>
+  <title>Ko Khant (Lin Htet Phyo) Management Software - Laptop Sales & Services</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -43,7 +43,7 @@
             <img src="logo.png" alt="Ko Khant Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full bg-indigo-600 flex items-center justify-center font-bold text-lg text-white\'>KK</div>';">
           </div>
           <div>
-            <h1 class="font-bold text-lg tracking-tight leading-tight">Ko Khant</h1>
+            <h1 class="font-bold text-lg tracking-tight leading-tight">Ko Khant (Lin Htet Phyo)</h1>
             <p class="text-xs text-indigo-400 font-medium tracking-wide">Laptop & Service Hub</p>
           </div>
         </div>
@@ -76,7 +76,7 @@
         <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
           <div class="flex items-center space-x-2 text-xs text-slate-400 mb-1">
             <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Ko Khant Software v1.2</span>
+            <span>Ko Khant (Lin Htet Phyo) v1.2</span>
           </div>
           <p class="text-xs text-slate-400">Offline & LocalStorage Active</p>
         </div>
@@ -596,7 +596,7 @@
     let services = [];
     let sales = [];
     let settings = {
-      shopName: "Ko Khant Laptop Sales & Services",
+      shopName: "Ko Khant (Lin Htet Phyo) Laptop Sales & Services",
       phone: "+95 9 123 456 789",
       currency: "$",
       address: "Downtown Commercial Center, Tech Plaza Shop #12"
@@ -1418,7 +1418,7 @@
     // Backup & Restore
     function exportDataJSON() {
       const bundle = {
-        app: "Ko Khant Management Software",
+        app: "Ko Khant (Lin Htet Phyo) Management Software",
         exportDate: new Date().toISOString(),
         settings: settings,
         laptops: laptops,
@@ -1428,7 +1428,7 @@
 
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bundle, null, 2));
       const downloadAnchor = document.createElement('a');
-      const filename = `KoKhant_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `KoKhant_LinHtetPhyo_Backup_${new Date().toISOString().split('T')[0]}.json`;
       downloadAnchor.setAttribute("href", dataStr);
       downloadAnchor.setAttribute("download", filename);
       document.body.appendChild(downloadAnchor);
