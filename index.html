@@ -69,7 +69,12 @@
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span>Settings & Backup</span>
           </button>
+                  <button onclick="lockApp()" title="Lock Screen" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-amber-400/90 hover:bg-slate-800 hover:text-amber-300">
+            <i data-lucide="lock" class="w-5 h-5"></i>
+            <span>Lock Screen</span>
+          </button>
         </nav>
+
       </div>
 
       <div class="p-4 border-t border-slate-800">
@@ -327,6 +332,53 @@
             <div class="pt-2">
               <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
                 Save Business Profile
+              </button>
+            </div>
+          </div>
+
+                    <!-- Access Permission & Security Lock Settings -->
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-base text-slate-800 flex items-center space-x-2">
+                  <i data-lucide="shield-check" class="w-5 h-5 text-indigo-600"></i>
+                  <span>Access Permission Lock (PIN Protection)</span>
+                </h3>
+                <p class="text-xs text-slate-500">Protect your shop records, laptop pricing, and customer details with a security PIN.</p>
+              </div>
+              <span id="lock-status-badge" class="px-2.5 py-1 text-xs rounded-full font-semibold bg-slate-100 text-slate-600">
+                Disabled
+              </span>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <label for="setting-lock-enabled" class="text-sm font-semibold text-slate-800 cursor-pointer">Enable Security Lock on Startup</label>
+                  <p class="text-xs text-slate-500">Require the PIN every time the app opens or when locked manually.</p>
+                </div>
+                <input type="checkbox" id="setting-lock-enabled" onchange="toggleLockCheckbox(this.checked)" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 cursor-pointer">
+              </div>
+
+              <div id="pin-config-section" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-200">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Set Access PIN / Password</label>
+                  <input type="password" id="setting-app-pin" placeholder="Enter 4-8 digit PIN (e.g. 1234)" maxlength="16" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">Confirm PIN</label>
+                  <input type="password" id="setting-app-pin-confirm" placeholder="Re-enter PIN" maxlength="16" class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-1 flex items-center space-x-3">
+              <button onclick="saveSecuritySettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition">
+                Update Security Settings
+              </button>
+              <button onclick="lockApp()" id="btn-test-lock" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition inline-flex items-center space-x-1.5">
+                <i data-lucide="lock" class="w-4 h-4 text-slate-500"></i>
+                <span>Lock Screen Now</span>
               </button>
             </div>
           </div>
@@ -599,13 +651,16 @@
       shopName: "Ko Khant (Lin Htet Phyo) Laptop Sales & Services",
       phone: "+95 9 123 456 789",
       currency: "$",
-      address: "Downtown Commercial Center, Tech Plaza Shop #12"
+      address: "Downtown Commercial Center, Tech Plaza Shop #12",
+      lockEnabled: false,
+      appPin: "1234"
     };
 
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
       renderAll();
+      checkAppLockOnStartup();
       lucide.createIcons();
     });
 
@@ -1499,6 +1554,135 @@
     function closeModal(id) {
       document.getElementById(id).classList.add('hidden');
     }
+  
+    // Access Permission Lock Logic
+    function isAppLocked() {
+      return settings.lockEnabled === true && sessionStorage.getItem('kokhant_unlocked') !== 'true';
+    }
+
+    function checkAppLockOnStartup() {
+      updateSecuritySettingsUI();
+      if (isAppLocked()) {
+        showLockScreen();
+      }
+    }
+
+    function showLockScreen() {
+      const lockScreen = document.getElementById('app-lock-screen');
+      const pinInput = document.getElementById('lock-pin-input');
+      const errorMsg = document.getElementById('lock-error-msg');
+      if (lockScreen) {
+        lockScreen.classList.remove('hidden');
+        errorMsg.classList.add('hidden');
+        pinInput.value = '';
+        setTimeout(() => pinInput.focus(), 100);
+      }
+    }
+
+    function lockApp() {
+      sessionStorage.removeItem('kokhant_unlocked');
+      showLockScreen();
+    }
+
+    function handleUnlockApp(e) {
+      e.preventDefault();
+      const enteredPin = document.getElementById('lock-pin-input').value;
+      const expectedPin = settings.appPin || '1234';
+      const errorMsg = document.getElementById('lock-error-msg');
+
+      if (enteredPin === expectedPin) {
+        sessionStorage.setItem('kokhant_unlocked', 'true');
+        document.getElementById('app-lock-screen').classList.add('hidden');
+        errorMsg.classList.add('hidden');
+      } else {
+        errorMsg.classList.remove('hidden');
+        document.getElementById('lock-pin-input').value = '';
+        document.getElementById('lock-pin-input').focus();
+      }
+    }
+
+    function toggleLockCheckbox(checked) {
+      const pinSection = document.getElementById('pin-config-section');
+      if (pinSection) {
+        pinSection.style.opacity = checked ? '1' : '0.5';
+      }
+    }
+
+    function updateSecuritySettingsUI() {
+      const isEnabled = settings.lockEnabled === true;
+      const chk = document.getElementById('setting-lock-enabled');
+      const badge = document.getElementById('lock-status-badge');
+      const pinInput = document.getElementById('setting-app-pin');
+      const pinConfirm = document.getElementById('setting-app-pin-confirm');
+
+      if (chk) chk.checked = isEnabled;
+      if (badge) {
+        badge.innerText = isEnabled ? 'Active PIN Lock' : 'Disabled';
+        badge.className = isEnabled 
+          ? 'px-2.5 py-1 text-xs rounded-full font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200'
+          : 'px-2.5 py-1 text-xs rounded-full font-semibold bg-slate-100 text-slate-600';
+      }
+      if (pinInput) pinInput.value = settings.appPin || '';
+      if (pinConfirm) pinConfirm.value = settings.appPin || '';
+      toggleLockCheckbox(isEnabled);
+    }
+
+    function saveSecuritySettings() {
+      const isEnabled = document.getElementById('setting-lock-enabled').checked;
+      const newPin = document.getElementById('setting-app-pin').value.trim();
+      const confirmPin = document.getElementById('setting-app-pin-confirm').value.trim();
+
+      if (isEnabled) {
+        if (!newPin) {
+          alert('Please enter a PIN (e.g. 4 digits like 1234) before enabling security lock.');
+          return;
+        }
+        if (newPin !== confirmPin) {
+          alert('PINs do not match! Please verify your PIN in both fields.');
+          return;
+        }
+        settings.lockEnabled = true;
+        settings.appPin = newPin;
+      } else {
+        settings.lockEnabled = false;
+      }
+
+      localStorage.setItem(KEY_SETTINGS, JSON.stringify(settings));
+      sessionStorage.setItem('kokhant_unlocked', 'true');
+      alert('Security lock settings saved successfully!');
+      updateSecuritySettingsUI();
+    }
+
   </script>
+  <!-- APP ACCESS LOCK SCREEN OVERLAY -->
+  <div id="app-lock-screen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl z-[9999] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl text-center space-y-6 border border-slate-100">
+      <div class="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shadow-md shadow-indigo-500/10">
+        <i data-lucide="lock" class="w-8 h-8"></i>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-bold text-slate-800 tracking-tight">Security Lock</h3>
+        <p class="text-xs text-slate-500 mt-1">Ko Khant (Lin Htet Phyo) Management Software</p>
+        <p class="text-xs text-slate-400 mt-0.5">Enter your PIN to access software records</p>
+      </div>
+
+      <form id="form-unlock" onsubmit="handleUnlockApp(event)" class="space-y-4">
+        <div>
+          <input type="password" id="lock-pin-input" autofocus autocomplete="off" placeholder="&bull; &bull; &bull; &bull;" maxlength="16" class="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-slate-50">
+          <p id="lock-error-msg" class="text-xs text-rose-500 font-medium mt-2 hidden">Incorrect PIN. Please try again.</p>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition">
+          Unlock System
+        </button>
+      </form>
+
+      <div class="pt-2 border-t border-slate-100">
+        <p class="text-[11px] text-slate-400">Authorized personnel only &bull; Data encrypted locally</p>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

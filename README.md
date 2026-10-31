@@ -8,6 +8,7 @@ A standalone web application designed for laptop retail shops and repair centers
 - **Sales & Customer Invoices**: Generates clean, printable invoices and repair job sheets with your shop's custom branding.
 - **Offline & Local Storage**: Automatically saves data in the browser's `localStorage`.
 - **JSON Data Export/Import**: One-click backups to safeguard data or transfer records across devices.
+- **Access Permission Lock (PIN Protection)**: Lock your shop records, profit margins, and customer data with a custom passkey/PIN, plus a 1-click Quick Lock button.
 
 ## 📁 Repository Structure
 ```
